@@ -1,0 +1,6 @@
+benchmark/*
+bin/*
+case_channel/*
+case_test/*
+TGVox/*
+*.o
