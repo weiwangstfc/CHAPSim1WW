@@ -379,7 +379,7 @@
     end subroutine
 
 
-    subroutine wrt_3d_pt_debug(var, str, loc)
+    subroutine wrt_3d_pt_debug(var, str, loc, iter, irk)
         use init_info
         use flow_info
         use postprocess_info
@@ -390,6 +390,7 @@
         real(WP), intent(in)     :: var(1:NCL1_io, 1:N2DO(myid), 1:NCL3)
         character(*), intent(in) :: str
         character(*), intent(in) :: loc
+        integer, intent(in)      :: iter, irk
 
         integer, parameter :: NPT = 4
         integer, parameter :: nfil = 20
@@ -428,8 +429,9 @@
                                      OPEN(nfil+n,FILE=TRIM(ADJUSTL(FLNM)) )
                                      !write(nfil+n,*) '# iter = ', ITERG
                                     END IF
-                                    write(*, *) I, JJ, K, xnd_io(i), Xcc_io(i), ynd(jj), ycc(jj), znd(k), zcc(k)
-                                    write(nfil+n, '(A, A, 3I4.1, 1ES17.7)') trim(str), trim(loc), i, jj, k, var(i, j, k)
+                                    !write(*, *) I, JJ, K, xnd_io(i), Xcc_io(i), ynd(jj), ycc(jj), znd(k), zcc(k)
+                                    write(nfil+n, '(A, A, 2I3.1, 3I4.1, 1ES17.7)') trim(str), &
+                                    trim(loc), iter, irk, i, jj, k, var(i, j, k)
                                     close(nfil+n)
                                 end if
                             end do

@@ -103,10 +103,10 @@
         
         CALL CALL_TEC360
 
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@bf solv') ! debug4chapsim2
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@bf solv') ! debug4chapsim2
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf solv') ! debug4chapsim2
-        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@bf solv') ! debug4chapsim2   
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@bf solv', 0, 0) ! debug4chapsim2   
         
         IF(PPROCESSONLY.eq.1) THEN
             CALL MPI_BARRIER(ICOMM,IERROR)

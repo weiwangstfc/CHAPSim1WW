@@ -132,6 +132,7 @@
                     CALL VELOCITY_CALC_io
                     CALL SOLVERRK3_MOM_IO(NS)
                 END IF
+                stop  ! debug4chapsim2
             END DO
             
             !===================================================
@@ -144,7 +145,7 @@
             CALL CALL_TEC360
             IF(TGFLOWflg) CALL POSTPROCESS_tg
             IF(IOFLOWflg) CALL POSTPROCESS_io
-
+            
         END DO 
 
        

@@ -34,15 +34,21 @@
           
             IDR = 1
             CALL VISCOUS_ALL_EXPLT_X_io
+            call wrt_3d_pt_debug(Qtmp_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
+            call wrt_3d_pt_debug(Qtmp_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@af stepping', ITERG, NS) ! debug4chapsim2
           
             IDR = 2
             CALL VISCOUS_ALL_EXPLT_Y_io
+            call wrt_3d_pt_debug(DPH_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
+            call wrt_3d_pt_debug(DPH_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@af stepping', ITERG, NS) ! debug4chapsim2
           
             IDR = 3
             CALL VISCOUS_ALL_EXPLT_Z_io
+            call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
+            call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@af stepping', ITERG, NS) ! debug4chapsim2
     
             CALL MASSFLUX_CALC_IO
             
@@ -68,9 +74,13 @@
 
         CALL INTFC_VARS3(1,NCL1_io,NCL1S,NCL1E,G_io)
         CALL BC_WALL_G_io
-        
+
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@bf divg', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@bf divg', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf divg', ITERG, NS) ! debug4chapsim2
         !=======STEP4: CONSTRUCTING AND SOLVING POISSION EQ.=====================
         CALL DIVG_io(NS)
+        call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@RHS phi', ITERG, NS) ! debug4chapsim2
         
         !CALL DEBUG_WRT_LOCAL(RHSLLPHI_io,1,N2DO(MYID),'divg') !test
         
@@ -83,15 +93,22 @@
         
         CALL INTFC_VARS1(1,NCL1_io,NCL1S,NCL1E,DPH_io)
         CALL BC_WALL_DPH_io
+
+        
+        call wrt_3d_pt_debug(DPH_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@sol phi', ITERG, NS) ! debug4chapsim2
         
         !CALL CHECK_FFT_SOLVER!test
         !CALL DEBUG_WRT_LOCAL(DPH_io,0,N2DO(MYID)+1,'dphi') !test
     
         !=======STEP5: CALCULATE PRESSURE=================
         CALL PRCALC_io(NS)
+        call wrt_3d_pt_debug(PR_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'pr', '@updated', ITERG, NS) ! debug4chapsim2
         
         !=======STEP6: CALCULATE mass flux=================
         CALL MASSFLUX_UPDATE_IO(NS)
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@updated', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@updated', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@updated', ITERG, NS) ! debug4chapsim2
 
         !=======STEP6: CALCULATE VELOCITY=================
         !CALL VELOCITY_CALC_io

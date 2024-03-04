@@ -260,7 +260,7 @@
                         PR_io(I,J,K) = (DCOS(2.0_WP*XCC_io(I))+DCOS(2.0_WP*YCC(JJ)))* &
                                        (DCOS(2.0_WP*ZCC(K))+2.0_WP)/16.0_WP
                                        
-                        if((i == 8) .and. (jj == 8) .and. (k == 8)) write(*,*) Q_io(I,J,K,1:3), PR_io(I,J,K)
+                        !if((i == 8) .and. (jj == 8) .and. (k == 8)) write(*,*) Q_io(I,J,K,1:3), PR_io(I,J,K)
                         !if (myid==0) WRITE(*,*) I, K, JJ, Q_io(I,J,K,1:3),PR_io(I,J,K)
                     END DO
                     
@@ -272,11 +272,11 @@
                     
                 END DO
             END DO
-                    ! TEST===========    
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@af init') ! debug4chapsim2
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@af init') ! debug4chapsim2
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@af init') ! debug4chapsim2
-        ! call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@af init') ! debug4chapsim2   
+        ! TEST===========    
+        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@af init', 0 ,0) ! debug4chapsim2
+        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@af init', 0 ,0) ! debug4chapsim2
+        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@af init', 0 ,0) ! debug4chapsim2
+        ! call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@af init', 0 ,0) ! debug4chapsim2   
         END IF
         !*****************************************************************************
         

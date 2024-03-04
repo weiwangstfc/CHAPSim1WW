@@ -21,7 +21,7 @@
 
         IF(MYID.NE.0) RETURN
         
-        NSST=1
+        NSST=3
         IF (NSST.EQ.3) THEN
             IF (MYID.EQ.0) call CHKHDL('         Time scheme: R-K 3rd order',MYID)
 !             RUNGE KUTTA Coefficients
