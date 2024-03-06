@@ -94,7 +94,7 @@
         CALL INTFC_VARS1(1,NCL1_io,NCL1S,NCL1E,DPH_io)
         CALL BC_WALL_DPH_io
 
-        
+        if(myid == 0) write(*,*) DPH_IO(1:NCL1_io, 1, 1)
         call wrt_3d_pt_debug(DPH_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@sol phi', ITERG, NS) ! debug4chapsim2
         
         !CALL CHECK_FFT_SOLVER!test
@@ -122,4 +122,38 @@
         !PR_io(4,N2DO(myid),4),PR_io(4,N2DO(myid)+1,4),PR_io(4,0,4),         PR_io(4,1,4)
         
         RETURN
+    END SUBROUTINE
+
+
+    SUBROUTINE TEST_POISSON
+        use cparam
+        use thermal_info 
+        use mesh_info
+        use flow_info
+        use init_info
+    implicit none
+    integer :: i, j, k
+
+    DO I = 1, NCL1_IO
+      DO J = 1, N2DO(myid)
+        DO K = 1, NCL3
+            RHSLLPHI_io(i, j, k) = - sin(xcc_io(i))
+        END DO
+      END DO
+    END DO 
+    IF(myid == 0) then
+        do i = 1, NCL1_IO
+            write(*,*) 'output', i, RHSLLPHI_io(i, 1, 1)
+        end do 
+    end if
+
+    CALL FFT99_POIS3D_periodicxz(IIO) !Method One 
+
+    IF(myid == 0) then
+        do i = 1, NCL1_IO
+            write(*,*) 'output', i, DPH_IO(i, 1, 1)
+        end do 
+    end if
+
+
     END SUBROUTINE
