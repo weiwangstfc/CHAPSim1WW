@@ -430,7 +430,7 @@
                                      !write(nfil+n,*) '# iter = ', ITERG
                                     END IF
                                     !write(*, *) I, JJ, K, xnd_io(i), Xcc_io(i), ynd(jj), ycc(jj), znd(k), zcc(k)
-                                    write(nfil+n, '(A, A, 2I3.1, 3I4.1, 1ES17.7)') trim(str), &
+                                    write(nfil+n, *) trim(str), &
                                     trim(loc), iter, irk, i, jj, k, var(i, j, k)
                                     close(nfil+n)
                                 end if
@@ -445,4 +445,50 @@
     return
 
     end subroutine
+
+subroutine wrt_3d_all_debug(var, str, loc, iter, irk)
+    use init_info
+    use flow_info
+    use postprocess_info
+    use mesh_info
+    use wrt_info
+    implicit none 
+    
+    real(WP), intent(in)     :: var(1:NCL1_io, 1:N2DO(myid), 1:NCL3)
+    character(*), intent(in) :: str
+    character(*), intent(in) :: loc
+    integer, intent(in)      :: iter, irk
+
+    integer, parameter :: nfil = 20
+    character(1) :: pntim
+    character(128) :: FLNM
+    logical :: file_exists
+    integer :: n, i, j, k, jj
+
+
+    write(pntim,'(i1.1)') myid
+    FLNM = 'code1ww_'//trim(str)//'_'//pntim//'.dat'
+    file_exists = .false.
+    INQUIRE(FILE=TRIM(ADJUSTL(FLNM)), EXIST=file_exists) 
+    IF(file_exists) THEN
+        OPEN(nfil+n,FILE=TRIM(ADJUSTL(FLNM)), position='append')
+        !write(nfil+n,*) '# iter = ', ITERG
+    ELSE
+        OPEN(nfil+n,FILE=TRIM(ADJUSTL(FLNM)) )
+        !write(nfil+n,*) '# iter = ', ITERG
+    END IF
+        
+    DO J = 1, N2DO(MYID)
+        JJ = JCL2G(J)
+        DO K =1, NCL3
+            DO I = 1, NCL1_IO    
+                write(nfil, *) JJ, K, I, var(i, j, k)
+            end do
+        END DO
+    END DO
+    close(nfil)
+
+return
+
+end subroutine
 

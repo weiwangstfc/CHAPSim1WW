@@ -135,7 +135,7 @@
                 ENDDO
             ENDDO
         ENDDO
-       
+       write(*,*) 'coeff',  COE0
         
         
         RETURN

@@ -80,8 +80,8 @@
         call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf divg', ITERG, NS) ! debug4chapsim2
         !=======STEP4: CONSTRUCTING AND SOLVING POISSION EQ.=====================
         CALL DIVG_io(NS)
-        call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@RHS phi', ITERG, NS) ! debug4chapsim2
-        
+        call wrt_3d_pt_debug (RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'PhiRHS', '@RHS phi', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_all_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'PhiRHS', '@RHS phi', ITERG, NS)
         !CALL DEBUG_WRT_LOCAL(RHSLLPHI_io,1,N2DO(MYID),'divg') !test
         
         IF(TGFLOWFLG) THEN
@@ -94,8 +94,9 @@
         CALL INTFC_VARS1(1,NCL1_io,NCL1S,NCL1E,DPH_io)
         CALL BC_WALL_DPH_io
 
-        if(myid == 0) write(*,*) DPH_IO(1:NCL1_io, 1, 1)
-        call wrt_3d_pt_debug(DPH_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@sol phi', ITERG, NS) ! debug4chapsim2
+        !if(myid == 0) write(*,*) DPH_IO(1:NCL1_io, 1, 1)
+        call wrt_3d_pt_debug (DPH_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@sol phi', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_all_debug(DPH_IO(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'phi', '@sol phi', ITERG, NS) ! debug4chapsim2
         
         !CALL CHECK_FFT_SOLVER!test
         !CALL DEBUG_WRT_LOCAL(DPH_io,0,N2DO(MYID)+1,'dphi') !test

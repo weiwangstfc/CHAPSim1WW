@@ -114,7 +114,7 @@
             STOP
         END IF
 
-        call TEST_POISSON  ! debug4chapsim2
+        !call TEST_POISSON  ! debug4chapsim2
 
         
         
