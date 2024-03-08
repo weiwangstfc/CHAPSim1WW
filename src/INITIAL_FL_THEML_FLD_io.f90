@@ -254,11 +254,11 @@
                 
                     DO J=1,N2DO(MYID)     
                         JJ=JCL2G(J) 
-                        Q_io(I,J,K,1)= DSIN(XND_io(I))*DCOS(YCC(JJ))*DCOS(ZCC(K))
-                        Q_io(I,J,K,2)=-DCOS(XCC_io(I))*DSIN(YND(JJ))*DCOS(ZCC(K))
+                        Q_io(I,J,K,1)= DSIN(XND_io(I))*DCOS(YCC(JJ))!*DCOS(ZCC(K))
+                        Q_io(I,J,K,2)=-DCOS(XCC_io(I))*DSIN(YND(JJ))!*DCOS(ZCC(K))
                         Q_io(I,J,K,3)= 0.0_WP
-                        PR_io(I,J,K) = (DCOS(2.0_WP*XCC_io(I))+DCOS(2.0_WP*YCC(JJ)))* &
-                                       (DCOS(2.0_WP*ZCC(K))+2.0_WP)/16.0_WP
+                        PR_io(I,J,K) = 0.0_WP!(DCOS(2.0_WP*XCC_io(I))+DCOS(2.0_WP*YCC(JJ)))* &
+                                       !(DCOS(2.0_WP*ZCC(K))+2.0_WP)/16.0_WP
                                        
                         !if((i == 8) .and. (jj == 8) .and. (k == 8)) write(*,*) Q_io(I,J,K,1:3), PR_io(I,J,K)
                         !if (myid==0) WRITE(*,*) I, K, JJ, Q_io(I,J,K,1:3),PR_io(I,J,K)

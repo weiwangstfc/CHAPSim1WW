@@ -116,7 +116,7 @@
                     DQCAP = DIVX + DIVY + DIVZ + DTRHO 
 
                     RHSLLPHI_io(IC,JC,KC)=DQCAP*COE0
-                    
+
 !                    IF(JJ==1)    THEN
 !                        RHSLLPHI_io(IC,JC,KC)=RHSLLPHI_io(IC,JC,KC)+AMPH0*DPDYWAL(IC,KC,1)/DYFI(1)
 !                        !write(*,*) JJ, DQCAP*COE0, AMPH0*DPDYWAL(IC,KC,1)*DYFI(1), RHSLLPHI_io(IC,JC,KC)
@@ -135,7 +135,7 @@
                 ENDDO
             ENDDO
         ENDDO
-       write(*,*) 'coeff',  COE0
+       !if(myid==0) write(*,*) 'rhs',  RHSLLPHI_io(8,8,8), RHSLLPHI_io(16,8,8), RHSLLPHI_io(32,8,8)
         
         
         RETURN

@@ -218,7 +218,7 @@ OBJ5= \
 		pythag.o\
    
 default:
-	@cd bin; make $(OUTPUT) -f ../Makefile
+	@cd bin; echo $(shell pwd); make $(OUTPUT) -f ../Makefile
 
 $(OUTPUT): $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
 	@echo -n "Linking... "

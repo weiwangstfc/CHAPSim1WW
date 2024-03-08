@@ -138,13 +138,13 @@
     DO I = 1, NCL1_IO
       DO J = 1, N2DO(myid)
         DO K = 1, NCL3
-            RHSLLPHI_io(i, j, k) = - sin(xcc_io(i))
+            RHSLLPHI_io(i, j, k) = - 4._WP * dsin(xcc_io(i)) * dcos(xcc_io(i))
         END DO
       END DO
     END DO 
     IF(myid == 0) then
         do i = 1, NCL1_IO
-            write(*,*) 'output', i, RHSLLPHI_io(i, 1, 1)
+            write(*,*) 'innput', i, RHSLLPHI_io(i, 8, 8)
         end do 
     end if
 
@@ -152,7 +152,7 @@
 
     IF(myid == 0) then
         do i = 1, NCL1_IO
-            write(*,*) 'output', i, DPH_IO(i, 1, 1)
+            write(*,*) 'output', i, DPH_IO(i, 8, 8)
         end do 
     end if
 
