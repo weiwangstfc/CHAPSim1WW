@@ -24,7 +24,7 @@
         
         SELECT CASE (icase)
            CASE (ICHANL)
-           
+             IF(ISTR2 == 1) then ! stretching
                 COE1    = 0.5_wp   
                 DO J=1,NND2             !!> @note: do j=1,NND2
                     X2=DBLE(J-1)/DBLE(NND2-1)   !!> @note: X2=(J-1)/(NND2-1), epslon, the relative computational domain 
@@ -34,6 +34,15 @@
                 DO J=1,NCL2
                     YCC(J)=(YND(J)+YND(J+1))*0.50_WP
                 ENDDO
+            else if (ISTR2 == 0) then ! no streching
+                DO  J=1,NND2
+                    YND(J) = HYB+DBLE(J-1)*((HYT-HYB)/DBLE(NCL2))
+                ENDDO
+                DO J=1,NCL2
+                    YCC(J) = 0.5_WP*(YND(J)+YND(J+1))
+                END DO
+            else
+            end if
                 
            CASE (IPIPEC)
            

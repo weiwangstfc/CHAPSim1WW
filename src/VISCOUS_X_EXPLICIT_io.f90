@@ -102,8 +102,77 @@
                     DTAU13DZ = (TAU13F-TAU13B)*COE32
                    
                     !================D_TAU_X DIRECTION=================================
+                    !Qtmp_io(IC,JC,KC) = Qtmp_io(IC,JC,KC) + DTAU11DX + DTAU12DY + DTAU13DZ
+
+
+! test
+!================DX_TAU_11=====================================
+                    ! at (i,  j,k)
+                    DUDX   = ( Q_io(IP,JC,KC,1) - Q_io(IC,JC,KC,1) ) * DXI 
+                    TAU11F = DUDX
+                   
+                    ! at (i-1,j,k)
+                    DUDX   = ( Q_io(IC,JC,KC,1) - Q_io(IM,JC,KC,1) ) * DXI
+                    TAU11B = DUDX
+                   
+                    ! at (i', j,k)
+                    DTAU11DX = (TAU11F-TAU11B)*COE1*0.5_WP
+                   
+                    !================DY_TAU_12=====================================
+                    ! at (i',j'+1,k)
+                    !VIS12P = ( VISCOUSITY(IC,JP,KC) + VISCOUSITY(IM,JP,KC) ) * YCL2ND_WFF(JJP) + &
+                    !         ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IM,JC,KC) ) * YCL2ND_WFB(JJP)
+                    VIS12P = MU_STG(IC,JP,KC,1)
+                    DUDY   = ( Q_io(IC,JP,KC,1) - Q_io(IC,JC,KC,1) ) * DYCI(JJP) / RNDI1(JJP)
+                    
+                    TAU12F = DUDY
+                   
+                    ! at (i',j',k)
+                    !VIS12C = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IM,JC,KC) ) * YCL2ND_WFF(JJ) + &
+                    !         ( VISCOUSITY(IC,JM,KC) + VISCOUSITY(IM,JM,KC) ) * YCL2ND_WFB(JJ)
+                    VIS12C = MU_STG(IC,JC,KC,1)
+                    IF(icase.eq.IPIPEC .and. jj.eq.1) THEN
+                        DUDY   = 0.0_wp
+                    ELSE
+                        DUDY   = ( Q_io(IC,JC,KC,1) - Q_io(IC,JM,KC,1) ) * DYCI(JJ) / RNDI1(JJ)
+                    END IF
+                    !DVDX   = ( Q_io(IC,JC,KC,2) - Q_io(IM,JC,KC,2) ) * DXI 
+                    TAU12B = DUDY
+                   
+                    ! at (i', j,k)
+                    DTAU12DY = (TAU12F-TAU12B)*COE2
+                    !IF(myid==0) write(*,*) 'viscx', JC, KC, IC, &
+                    !TAU12F, TAU12B, VIS12P, VIS12C
+                   
+                    !================DZ_TAU_13=====================================
+                    ! at (i',j,k'+1)
+                    !VIS13P = ( VISCOUSITY(IC,JC,KP) + VISCOUSITY(IM,JC,KP) ) + &
+                    !         ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IM,JC,KC) ) 
+                    !VIS13P = MU_STG(IC,JC,KP,2)
+                    DUDZ = ( Q_io(IC,JC,KP,1) - Q_io(IC,JC,KC,1) ) * DZI
+                    !DWDX = ( Q_io(IC,JC,KP,3) - Q_io(IM,JC,KP,3) ) * DXI 
+                    TAU13F = DUDZ
+                   
+                    ! at (i',j,k')
+                    !VIS13C = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IM,JC,KC) ) + &
+                    !         ( VISCOUSITY(IC,JC,KM) + VISCOUSITY(IM,JC,KM) )
+                    VIS13C = MU_STG(IC,JC,KC,2)
+                    DUDZ = ( Q_io(IC,JC,KC,1) - Q_io(IC,JC,KM,1) ) * DZI
+                    DWDX = ( Q_io(IC,JC,KC,3) - Q_io(IM,JC,KC,3) ) * DXI 
+                    TAU13B = DUDZ
+                   
+                    ! at (i', j,k)
+                    DTAU13DZ = (TAU13F-TAU13B)*COE32
+
                     Qtmp_io(IC,JC,KC) = Qtmp_io(IC,JC,KC) + DTAU11DX + DTAU12DY + DTAU13DZ
 
+! end test
+
+
+
+
+
+                    !Qtmp_io(IC,JC,KC) = DTAU11DX !+ DTAU12DY + DTAU13DZ
                     !IF(myid==0) write(*,*) 'viscx', JC, KC, IC, &
                     !DTAU11DX ,DTAU12DY,DTAU13DZ,Qtmp_io(IC,JC,KC)
                 END DO

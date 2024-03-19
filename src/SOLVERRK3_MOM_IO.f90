@@ -33,22 +33,22 @@
             CALL DIVG_U_io
           
             IDR = 1
-            CALL VISCOUS_ALL_EXPLT_X_io
+            CALL VISCOUS_ALL_EXPLT_X_io !test
             call wrt_3d_pt_debug(Qtmp_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
-            call wrt_3d_pt_debug(Qtmp_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@af stepping', ITERG, NS) ! debug4chapsim2
+            call wrt_3d_pt_debug(Qtmp_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@total', ITERG, NS) ! debug4chapsim2
           
             IDR = 2
             CALL VISCOUS_ALL_EXPLT_Y_io
             call wrt_3d_pt_debug(DPH_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
-            call wrt_3d_pt_debug(DPH_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@af stepping', ITERG, NS) ! debug4chapsim2
+            call wrt_3d_pt_debug(DPH_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@total', ITERG, NS) ! debug4chapsim2
           
             IDR = 3
             CALL VISCOUS_ALL_EXPLT_Z_io
             call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@bf stepping', ITERG, NS) ! debug4chapsim2
             CALL RHS_MOM_EXPLICIT_io(NS,IDR)
-            call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@af stepping', ITERG, NS) ! debug4chapsim2
+            call wrt_3d_pt_debug(RHSLLPHI_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@total', ITERG, NS) ! debug4chapsim2
     
             CALL MASSFLUX_CALC_IO
             

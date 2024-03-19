@@ -161,7 +161,13 @@
         
         !CALL DEBUG_WRT_UWP_io ! test
         !CALL DEBUG_WRT_LOCAL(Qtmp_io,1,N2DO(MYID),'conx') ! test
-        
+        !  if(myid == 0) then        
+        !      write(*,*) 'init1 ux', Q_io(:, 8, 8, 1), Q_io(:, 1, 8, 1)
+        !      write(*,*) 'init1 uy', Q_io(:, 8, 8, 2), Q_io(:, 1, 8, 3)
+        !      write(*,*) 'init1 uz', Q_io(:, 8, 8, 3), Q_io(:, 1, 8, 4)
+        !      write(*,*) 'conx', Qtmp_io(:, 8, 8), Qtmp_io(:, 1, 8)
+        !  end if
+
         RETURN
     END SUBROUTINE
 

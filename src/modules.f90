@@ -934,3 +934,27 @@
         REAL(WP),Parameter :: SL_K0  = 0.023961_WP  ! W/mK
         
     END MODULE Flow_State_Constant
+    
+module flatten_index_mod
+ implicit none 
+ 
+ interface flatten_index
+   module procedure flatten_3d_to_1d
+   module procedure flatten_2d_to_1d
+ end interface
+ 
+contains
+
+ function flatten_3d_to_1d(i, j, k, Nx, Ny, Nz) result(n)
+   integer, intent(in) :: i, j, k, Nx, Ny, Nz
+   integer :: n
+   n = i + Nx * (j - 1)  + Nx * Ny * (k - 1)
+ end function
+ 
+ function flatten_2d_to_1d(i, j, Nx, Ny) result(n)
+   integer, intent(in) :: i, j, Nx, Ny
+   integer :: n
+   n = i + Nx * (j - 1)
+ end function
+ 
+end module

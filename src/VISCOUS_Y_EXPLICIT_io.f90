@@ -103,9 +103,70 @@
                        DTAU23DZ = (TAU23F-TAU23B)*COE3
                        
                        !================D_TAU_Y DIRECTION=================================
+                       !DPH_io(IC,JC,KC)= DPH_io(IC,JC,KC) + DTAU21DX + DTAU22DY + DTAU23DZ
+                       !IF(JJ==2 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'viscy',&
+                        !DTAU21DX ,DTAU22DY,DTAU23DZ,RHS_io(IC,JC,KC)
+! test
+
+!================DY_TAU_22=====================================
+                       ! at (i,j,  k)
+                       DVDY   = ( Q_io(IC,JP,KC,2) - Q_io(IC,JC,KC,2) ) * DYFI(JJ)
+                       TAU22F = DVDY
+                       ! at (i,j-1,k)
+                       DVDY   = ( Q_io(IC,JC,KC,2) - Q_io(IC,JM,KC,2) ) * DYFI(JJM)
+                       TAU22B = DVDY
+                       ! at (i,j', k)
+                       DTAU22DY = (TAU22F-TAU22B)*COE2*0.5_WP
+                       
+                       !================DX_TAU_21=====================================
+                       ! at (i'+1,j', k)
+                       !VIS21P = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IP,JC,KC) ) * YCL2ND_WFF(JJ) + &
+                       !         ( VISCOUSITY(IC,JM,KC) + VISCOUSITY(IP,JM,KC) ) * YCL2ND_WFB(JJ)
+                       VIS21P = MU_STG(IP,JC,KC,1)
+                       DVDX   = ( Q_io(IP,JC,KC,2) - Q_io(IC,JC,KC,2) ) * DXI 
+                       !DUDY   = ( Q_io(IP,JC,KC,1) - Q_io(IP,JM,KC,1) ) * DYCI(JJ)
+                       TAU21F = DVDX
+                       
+                       ! at (i',  j', k)
+                       !VIS21C = ( VISCOUSITY(IM,JC,KC) + VISCOUSITY(IC,JC,KC) ) * YCL2ND_WFF(JJ) + &
+                       !         ( VISCOUSITY(IM,JM,KC) + VISCOUSITY(IC,JM,KC) ) * YCL2ND_WFB(JJ)
+                       VIS21C = MU_STG(IC,JC,KC,1)
+                       DVDX   = ( Q_io(IC,JC,KC,2) - Q_io(IM,JC,KC,2) ) * DXI 
+                       !DUDY   = ( Q_io(IC,JC,KC,1) - Q_io(IC,JM,KC,1) ) * DYCI(JJ)
+                       TAU21B = DVDX
+                       
+                       ! at (i,   j', k)
+                       DTAU21DX = (TAU21F-TAU21B)*COE1
+                       
+                       !write(*,*) 'G,j,i,k',jj,kc,ic,VISCOUSITY(IM,JM,KC), VISCOUSITY(IC,JM,KC)
+                       
+                       !================DZ_TAU_23=====================================
+                       ! at (i, j', k'+1)
+                       !VIS23P = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IC,JC,KP) ) * YCL2ND_WFF(JJ) + &
+                       !         ( VISCOUSITY(IC,JM,KC) + VISCOUSITY(IC,JM,KP) ) * YCL2ND_WFB(JJ)
+                       VIS23P = MU_STG(IC,JC,KP,3)
+                       DVDZ   = ( Q_io(IC,JC,KP,2) - Q_io(IC,JC,KC,2) ) * DZI 
+                       !DWDY   = ( Q_io(IC,JC,KP,3) - Q_io(IC,JM,KP,3) ) * DYCI(JJ)
+                       TAU23F = DVDZ
+                       
+                       ! at (i, j', k'  )
+                       !VIS23C = ( VISCOUSITY(IC,JC,KM) + VISCOUSITY(IC,JC,KC) ) * YCL2ND_WFF(JJ) + &
+                       !         ( VISCOUSITY(IC,JM,KM) + VISCOUSITY(IC,JM,KC) ) * YCL2ND_WFB(JJ)
+                       VIS23C = MU_STG(IC,JC,KC,3)
+                       DVDZ   = ( Q_io(IC,JC,KC,2) - Q_io(IC,JC,KM,2) ) * DZI 
+                       DWDY   = ( Q_io(IC,JC,KC,3) - Q_io(IC,JM,KC,3) ) * DYCI(JJ)
+                       TAU23B = DVDZ
+                       
+                       ! at (i, j', k   )
+                       DTAU23DZ = (TAU23F-TAU23B)*COE3
+                       
+                       !================D_TAU_Y DIRECTION=================================
                        DPH_io(IC,JC,KC)= DPH_io(IC,JC,KC) + DTAU21DX + DTAU22DY + DTAU23DZ
                        !IF(JJ==2 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'viscy',&
                         !DTAU21DX ,DTAU22DY,DTAU23DZ,RHS_io(IC,JC,KC)
+! test end
+
+!
                     END DO
                 END DO
             END DO

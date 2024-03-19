@@ -103,6 +103,12 @@
         
         CALL CALL_TEC360
 
+        if(myid == 0) then        
+            write(*,*) 'init ux', Q_io(:, 8, 8, 1)!, Q_io(:, 1, 8, 1) !test
+            write(*,*) 'init uy', Q_io(:, 8, 8, 2)!, Q_io(:, 1, 8, 2) !test
+            write(*,*) 'init uz', Q_io(:, 8, 8, 3)!, Q_io(:, 1, 8, 3) !test
+        end if
+
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@bf solv', 0, 0) ! debug4chapsim2
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@bf solv', 0, 0) ! debug4chapsim2
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf solv', 0, 0) ! debug4chapsim2

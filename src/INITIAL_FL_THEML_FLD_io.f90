@@ -29,23 +29,27 @@
 
         !>================ Q=Q-Qxzmean=========================================
         !>    INFLOW/OUTFLOW Domain***
-        IF(thermlflg==1) CALL INTFC_MFD_THERMAL_io
-        CALL INTFC_VARS3(NCL1S,NCL1E,NCL1S,NCL1E,Q_io)
-        CALL BC_WALL_Q_io
-        CALL INITIAL_MEAN_IO
-        DO L=1,3
-            DO J=1,N2DO(MYID)
-                Q_IO(:,J,:,L)= Q_IO(:,J,:,L) - UU(J,L,2)
-            ENDDO
-        END DO 
+        ! IF(thermlflg==1) CALL INTFC_MFD_THERMAL_io
+        ! CALL INTFC_VARS3(NCL1S,NCL1E,NCL1S,NCL1E,Q_io)
+        ! CALL BC_WALL_Q_io
+        ! CALL INITIAL_MEAN_IO
+        ! DO L=1,3
+        !     DO J=1,N2DO(MYID)
+        !         Q_IO(:,J,:,L)= Q_IO(:,J,:,L) - UU(J,L,2)
+        !     ENDDO
+        ! END DO 
      
-        CALL VMAV_io          
-        IF(MYID.EQ.0) THEN
-            CALL CHKHDL('   (2-2) IO: VMV(1:3) in random velocity after subtracting meanXZ ',myid) 
-            WRITE(*,'(A,25X,A,3ES23.15)') '#','==> Max. U, V, W', (VMAX_io(L),L=1,3)
-            WRITE(*,'(A,25X,A,3ES23.15)') '#','==> Min. U, V, W', (VMIN_io(L),L=1,3)
-        END IF
-      
+        ! CALL VMAV_io          
+        ! IF(MYID.EQ.0) THEN
+        !     CALL CHKHDL('   (2-2) IO: VMV(1:3) in random velocity after subtracting meanXZ ',myid) 
+        !     WRITE(*,'(A,25X,A,3ES23.15)') '#','==> Max. U, V, W', (VMAX_io(L),L=1,3)
+        !     WRITE(*,'(A,25X,A,3ES23.15)') '#','==> Min. U, V, W', (VMIN_io(L),L=1,3)
+        ! END IF
+! if(myid == 0) then        
+!     write(*,*) 'ux, random', Q_io(:, 8, 8, 1)
+!     write(*,*) 'uy, random', Q_io(:, 8, 8, 2)
+!     write(*,*) 'uz, random', Q_io(:, 8, 8, 3)
+! end if
         IF(ICASE.NE.IBOX3P) THEN !!!added
         !>===========update Q in the incoming flow direction====================  
         DO J=1,N2DO(MYID)
@@ -53,10 +57,16 @@
             DO I=1,NCL1E
                 DO K=1,NCL3
                     Q_io(I,J,K,NFLOW)= Q_io(I,J,K,NFLOW) + Vini(JJ)  
+                    !write(*,*) K, I, JJ, Q_io(I,J,K,NFLOW), Vini(JJ)  
                 ENDDO
             ENDDO
         ENDDO  
-                
+! if(myid == 0) then        
+!     write(*,*) 'ux, random+Vini', Q_io(:, 8, 8, 1)
+!     write(*,*) 'uy, random+Vini', Q_io(:, 8, 8, 2)
+!     write(*,*) 'uz, random+Vini', Q_io(:, 8, 8, 3)
+! end if
+
         !IF(ICASE.NE.ICHANL) CALL VELO2RVELO_IO
         
         !>    @note Set Q(I,J,K,2)=v at Wall b.c. be zero.    
@@ -74,7 +84,12 @@
         CALL BULK_VELOCITY_IO(Umean1_io)
         IF(MYID.EQ.0) call CHKRLHDL  ('        IO: The bulk velocity (corrected)=       ',MYID,Umean1_io)
         END IF
-        
+
+!  if(myid == 0) then        
+!     write(*,*) 'init ux', Q_io(:, 8, 8, 1), Q_io(:, 8, 1, 1)
+!     write(*,*) 'init uy', Q_io(:, 8, 8, 2), Q_io(:, 8, 1, 2)
+!     write(*,*) 'init uz', Q_io(:, 8, 8, 3), Q_io(:, 8, 1, 3)
+! end if       
         
         !>============CHECK DIVERGENCE======================================          
         CALL INTFC_VARS3(NCL1S,NCL1E,NCL1S,NCL1E,Q_io)
@@ -157,28 +172,28 @@
         use init_info
         use mesh_info
         use flow_info
+        use flatten_index_mod
         IMPLICIT NONE      
        
        
         INTEGER(4) :: I
         INTEGER(4) :: J, JJ
-        INTEGER(4) :: K
+        INTEGER(4) :: K, N, N2
         INTEGER(4) :: RDCOUNT, seed
 !       INTEGER(4) :: IDUM
         REAL(WP)    :: VPERQ
         REAL(WP)    :: XRDM(3)
-        REAL(WP)    :: XRD(3)
+        REAL(WP)    :: XRD(3), RD
+        integer :: seed0 = 123456
     
        
-        INTEGER(4)  :: RANDOMTYPE=2  !=1 for real random, =2 for fixed random
+        INTEGER(4)  :: RANDOMTYPE=3  !=1 for real random, =2 for fixed random, = 3 for fixed, consistent with CHAPSim2
         
         
         IF(.NOT.IOFLOWflg) RETURN
         
         IF(ICASE .EQ. IBOX3P) THEN
             RANDOMTYPE=100
-        ELSE
-            RANDOMTYPE=2
         END IF
        
         IF (RANDOMTYPE==1) THEN
@@ -241,6 +256,36 @@
                 IF(JJ==1) Q_IO(:,J,:,2) = 0.0_WP
             ENDDO
         END IF
+      
+        IF (RANDOMTYPE==3) THEN
+            DO N = 1, NDV
+               IF (N==2) then
+                 N2 = NND2
+               ELSE
+                 N2 = NCL2
+               END IF
+              DO K = 1, NCL3
+                DO J = 1, N2DO(MYID)
+                   JJ = JCL2G(J)
+                   VPERQ=VPERG                               
+                   IF((1.0_WP-DABS(YND(JJ))).LT.0.250_WP) VPERQ=VPERG*SVPERG
+                   DO I = 1, NCL1E
+                     seed = flatten_index(i, jj, k, NCL1E, N2, NCL3) + seed0 * n
+                     call random_initialize ( seed )
+                     call r_random( -1.0_WP, 1.0_WP, rd)
+                     !write(*,*) 'rd', rd, VPERQ
+                     if(n == 1) Q_io(I,J,K,1)=VPERQ*RD
+                     if(n == 2) Q_io(I,J,K,2)=VPERQ*RD /RNDI1(JJ)
+                     if(n == 3) Q_io(I,J,K,3)=VPERQ*RD /RCCI1(JJ)
+                     !write(*,*) N, Q_io(I,J,K,N)
+                   END DO 
+                   IF(JJ==1) Q_IO(:,J,:,2) = 0.0_WP
+                END DO
+              END DO 
+            END DO
+        END IF
+
+
         PR_io(:,:,:)  = 0.0_WP
         
         !******************************************************************
@@ -254,11 +299,11 @@
                 
                     DO J=1,N2DO(MYID)     
                         JJ=JCL2G(J) 
-                        Q_io(I,J,K,1)= DSIN(XND_io(I))*DCOS(YCC(JJ))!*DCOS(ZCC(K))
-                        Q_io(I,J,K,2)=-DCOS(XCC_io(I))*DSIN(YND(JJ))!*DCOS(ZCC(K))
+                        Q_io(I,J,K,1)= DSIN(XND_io(I))*DCOS(YCC(JJ))*DCOS(ZCC(K))
+                        Q_io(I,J,K,2)=-DCOS(XCC_io(I))*DSIN(YND(JJ))*DCOS(ZCC(K))
                         Q_io(I,J,K,3)= 0.0_WP
-                        PR_io(I,J,K) = 0.0_WP!(DCOS(2.0_WP*XCC_io(I))+DCOS(2.0_WP*YCC(JJ)))* &
-                                       !(DCOS(2.0_WP*ZCC(K))+2.0_WP)/16.0_WP
+                        PR_io(I,J,K) = (DCOS(2.0_WP*XCC_io(I))+DCOS(2.0_WP*YCC(JJ)))* &
+                                       (DCOS(2.0_WP*ZCC(K))+2.0_WP)/16.0_WP
                                        
                         !if((i == 8) .and. (jj == 8) .and. (k == 8)) write(*,*) Q_io(I,J,K,1:3), PR_io(I,J,K)
                         !if (myid==0) WRITE(*,*) I, K, JJ, Q_io(I,J,K,1:3),PR_io(I,J,K)
@@ -294,7 +339,11 @@
             
         CALL VELO2MASSFLUX
         
-        !CALL DEBUG_WRT_QGP_io
+        ! if(myid == 0) then        
+        !     write(*,*) 'ux, random', Q_io(:, 8, 8, 1), Q_io(:, 1, 8, 1)
+        !     write(*,*) 'uy, random', Q_io(:, 8, 8, 2), Q_io(:, 1, 8, 2)
+        !     write(*,*) 'uz, random', Q_io(:, 8, 8, 3), Q_io(:, 1, 8, 3)
+        ! end if
  
         RETURN
     END SUBROUTINE
