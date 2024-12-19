@@ -83,7 +83,7 @@
                     DX_RHOHU =  ( ENTHALPY(IP,JC,KC) + ENTHALPY(IC,JC,KC) ) * ( G0_io(IP,JC,KC,1) + G_io(IP,JC,KC,1) ) - &
                                 ( ENTHALPY(IC,JC,KC) + ENTHALPY(IM,JC,KC) ) * ( G0_io(IC,JC,KC,1) + G_io(IC,JC,KC,1) )
                     DX_RHOHU =   DX_RHOHU * COE1  ! *XND2CL*DXI*0.5_wp
-       
+
                
                     ! $ \delta_y [ (h)^y \cdot G_Y ] $
                     ! (I, J, K) = (I, J'+1, K)  - (I, J', K)   DY
@@ -92,7 +92,7 @@
                                 ( YCL2ND_WFF(JJ) *ENTHALPY(IC,JC,KC) +                         &
                                   YCL2ND_WFB(JJ) *ENTHALPY(IC,JM,KC) ) * ( G0_io(IC,JC,KC,2) + G_io(IC,JC,KC,2) )
                     DY_RHOHV = DY_RHOHV * COE2 !*RCCI1(JJ)*DYFI(JJ)*0.5_wp
-                
+
                     ! $ \delta_z [ (\rho h)^z \cdot w ] $
                     ! (I, J, K) = (I, J, K'+1)  - (I, J, K')   DZ
                     DZ_RHOHW =  ( ENTHALPY(IC,JC,KP) + ENTHALPY(IC,JC,KC) ) * ( G0_io(IC,JC,KP,3) + G_io(IC,JC,KP,3) ) - &
@@ -130,6 +130,15 @@
              
                     !=======EXPLICIT RHS OF ENERGY EQUATION====================
                     RHS_ENERGY(IC,JC,KC) = -DX_RHOHU - DY_RHOHV - DZ_RHOHW + DX_KDT + DY_KDT + DZ_KDT
+
+                    if(IC==4 .and. JJ<=4 .and. KC==4 .and. myid==0) then
+                        write(*,*)'conx-e, cony-e, conz-e, dif-x, dif-y, dif-z', &
+                        DX_RHOHU, DY_RHOHV, DZ_RHOHW, DX_KDT, DY_KDT, DZ_KDT
+                    end if
+                    if(IC==4 .and. JC<=4 .and. KC==4 .and. myid==0) then
+                        write(*,*)'diy-dT', 'dify-k', &
+                        KDTy2, THERMCONDT(IC,JC,KC)
+                    end if
                                            
                 END DO
             END DO

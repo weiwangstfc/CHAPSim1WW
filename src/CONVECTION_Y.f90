@@ -213,7 +213,8 @@
                     H23   = ( H23F - H23B) * COE31
                    
                     DPH_io(IC,JC,KC) = -(H21+H22+H23)   !H for momentum y direction.
-                    !IF(JJ==2 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'convy',H21,H22,H23,DPH_io(IC,JC,KC)
+                    ! IF(myid==0 .and. JJ<=4 .and. IC==4 .and. KC==4) &
+                    ! write(*,*) 'convy', JJ, H21,H22,H23,DPH_io(IC,JC,KC)
                 END DO
             END DO
         END DO

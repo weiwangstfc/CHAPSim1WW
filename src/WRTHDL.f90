@@ -392,17 +392,19 @@
         character(*), intent(in) :: loc
         integer, intent(in)      :: iter, irk
 
-        integer, parameter :: NPT = 4
+        integer, parameter :: NPT = 8
         integer, parameter :: nfil = 20
-        INTEGER  :: nid(4, 3), a(12)
+        INTEGER  :: nid(8, 3), a(24)
 
         CHARACTER(1) :: PNTIM
         character(128) :: FLNM
         logical :: file_exists
         integer :: n, i, j, k, jj
 
-        a = (/8, 16, 32, 40, 8, 16, 32, 40, 8, 16, 32, 40/)
-        nid = RESHAPE(a, (/4, 3/))
+        a = (/1, 1, 1, 1, 8, 8, 8, 8, &
+        1, 2, 3, 4, 1, 2, 3, 4, &
+        1, 1, 1, 1, 8, 8, 8, 8/)
+        nid = reshape(a, (/8, 3/))
 
 
         !write(*, *) 'var sz', ubound(var, 1), ubound(var, 2), ubound(var, 3)
@@ -410,7 +412,7 @@
         do n = 1, NPT
             
             WRITE(PNTIM,'(I1.1)') n
-            FLNM = 'code1ww_p'//PNTIM//'_'//trim(str)//'.dat'
+            FLNM = 'code1ww_p'//PNTIM//trim(str)//'.dat'
             
 
             DO J = 1, N2DO(MYID)
@@ -430,7 +432,7 @@
                                      !write(nfil+n,*) '# iter = ', ITERG
                                     END IF
                                     !write(*, *) I, JJ, K, xnd_io(i), Xcc_io(i), ynd(jj), ycc(jj), znd(k), zcc(k)
-                                    write(nfil+n, *) trim(str), &
+                                    write(nfil+n, '(A2, A15, 2I2.1, 3I4.1, 1ES27.19)') trim(str), &
                                     trim(loc), iter, irk, i, jj, k, var(i, j, k)
                                     close(nfil+n)
                                 end if
@@ -465,9 +467,9 @@ subroutine wrt_3d_all_debug(var, str, loc, iter, irk)
     logical :: file_exists
     integer :: n, i, j, k, jj
 
-
+!if(myid/=0) return
     write(pntim,'(i1.1)') myid
-    FLNM = 'code1ww_'//trim(str)//'_'//pntim//'.dat'
+    FLNM = 'code1ww_'//trim(str)//'_myid'//pntim//'.dat'
     file_exists = .false.
     INQUIRE(FILE=TRIM(ADJUSTL(FLNM)), EXIST=file_exists) 
     IF(file_exists) THEN
@@ -482,7 +484,7 @@ subroutine wrt_3d_all_debug(var, str, loc, iter, irk)
         JJ = JCL2G(J)
         DO K =1, NCL3
             DO I = 1, NCL1_IO    
-                write(nfil, *) JJ, K, I, var(i, j, k)
+                write(nfil, '(3I4.1, 1ES27.19)') I, JJ, K, var(i, j, k)
             end do
         END DO
     END DO

@@ -37,7 +37,7 @@
         
         INTEGER(4),PARAMETER :: IBCWALL = 1
         INTEGER(4),PARAMETER :: IBCPERI = 3
-        INTEGER(4),PARAMETER :: IBCSYMM = 2
+        INTEGER(4),PARAMETER :: IBCNEUM = 2
         
         
         INTEGER(4),PARAMETER :: Ibotwall =  1
@@ -409,6 +409,7 @@
         REAL(WP)      :: PL_KT  = 0.805_WP
          
         !==============INI FOR REFEENCE STATE==DIMENSIONAL====
+        REAL(WP)      :: Ti
         REAL(WP)      :: L0  !  (m)
         REAL(WP)      :: U0  !  (m/s)
         REAL(WP)      :: P0  !  (Pa)

@@ -133,6 +133,11 @@
         
         CALL INTFC_VARS3(NCL1S,NCL1E,NCL1S,NCL1E,Q_io)
         CALL BC_WALL_Q_io
+
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'qx@updated', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'qy@updated', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'qz@updated', 0, 0) ! debug4chapsim2
+        
       
         RETURN
     END SUBROUTINE

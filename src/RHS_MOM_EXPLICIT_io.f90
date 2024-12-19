@@ -70,6 +70,9 @@
                         RHSL = EXPLT0_io(IC,JC,KC,IDR) ! LAST
                         RHS_io(IC,JC,KC)= (TGAM(NS)*RHSC + TROH(NS)* RHSL) * DT
                         EXPLT0_io(IC,JC,KC,IDR) = RHSC
+                        ! if(IC==1 .and. JC==1 .and. KC==1 .and. myid==0) then
+                        !     write(*,*)'test1', TGAM(NS), TROH(NS), RHSC, RHSL, DT, RHS_io(IC,JC,KC)
+                        ! end if
                     END DO
                 END DO
             END DO   
@@ -84,6 +87,7 @@
                                            COE2 * RHS_io(IC,JC,KC) + &
                                            0.5_WP*COE2 * DIVU_io(IC,JC,KC)
                         EXPLT0_io(IC,JC,KC,IDR) = RHSC
+                        
                     END DO
                 END DO
             END DO   
@@ -106,10 +110,13 @@
                             PGM = ( PR_io(IC,JC,KC)-PR_io(IM,JC,KC) )*COE2
                         END IF 
                         RHS_io(IC,JC,KC)=RHS_io(IC,JC,KC)-PGM
+                        ! if(IC==1 .and. JC==1 .and. KC==1 .and. myid==0) then
+                        !     write(*,*)'test2', PGM/TALP(NS)/DT, RHS_io(IC,JC,KC)
+                        ! end if
                     ENDDO
                 ENDDO
             ENDDO
-            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisX', '@af stepping', ITERG, NS) ! debug4chapsim2
+            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPX@af st', ITERG, NS) ! debug4chapsim2
         ELSE IF (IDR.EQ.2) THEN 
             
             DO JC=NYI,N2DO(MYID)
@@ -129,7 +136,7 @@
                     ENDDO
                 ENDDO
             ENDDO    
-            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisY', '@af stepping', ITERG, NS) ! debug4chapsim2  
+            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPY@af st', ITERG, NS) ! debug4chapsim2  
         ELSE IF (IDR.EQ.3) THEN
             COE2 = TALP(NS)* DT*DZI
             DO KC=1,NCL3
@@ -147,7 +154,7 @@
                     ENDDO
                 ENDDO
             ENDDO  
-            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), 'ConVisZ', '@af stepping', ITERG, NS) ! debug4chapsim2
+            call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPZ@af st', ITERG, NS) ! debug4chapsim2
         ELSE       
         ENDIF
         
@@ -228,7 +235,10 @@
                 IF(MYID.EQ.0) DPGRNS = -0.50_WP*CFGV*COE2 !dimensionless based on \delta and U_m
             ELSE
             END IF  
-             
+            if(myid==0) then
+                write(*,*) 'compensition', DPGRNS
+                !write(*,*) 'rhsx:', RHS_io(:, 1, 1), RHS_io(:, 4, 4)
+            end if
             CALL MPI_BCAST( DPGRNS, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
 
             DO KC=1,NCL3

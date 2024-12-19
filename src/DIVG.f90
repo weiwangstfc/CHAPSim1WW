@@ -86,7 +86,7 @@
         ELSE
             COE0 = 1.0_wp/DT/TALP(NS)
         END IF
-        
+        !write(*,*) 'phi-rhs-coeff', COE0
         DO JC=1,N2DO(MYID)
             JP = JLPV(JC)
             JJ = JCL2G(JC)
@@ -131,6 +131,13 @@
 !                    DIVX/COE1,DIVY/COE2,DIVZ/DZI, &
 !                    DENSITY(IC,JC,KC),DENSITY0(IC,JC,KC), &
 !                    DTRHO/COE4,DQCAP
+! if(myid==0 .and. IC==8 .and. JC==8 .and. KC==8) then
+! write(*,*)'div, x', DIVX
+! write(*,*)'div, y', DIVY
+! write(*,*)'div, z', DIVZ
+! write(*,*)'divall', DQCAP
+! write(*,*)'divadd', DTRHO, COE0
+! end if
                     
                 ENDDO
             ENDDO

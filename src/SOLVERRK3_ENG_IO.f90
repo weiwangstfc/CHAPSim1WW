@@ -20,7 +20,7 @@
         COE0 = TROH(NS)*DT
 
         CALL RHS_ENERGY_EXPLICIT
-        
+        call wrt_3d_pt_debug(RHS_ENERGY(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'energy_rhs@bf st', ITERG, NS) ! debug4chapsim2
         RHOH0(:,:,:)      = RHOH(:,:,:)
         DO J=1,N2DO(MYID)
             DO I=1,NCL1_IO
@@ -32,6 +32,8 @@
                 END DO
             END DO 
         END DO
+        call wrt_3d_pt_debug(RHOH(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'rhoh@af st', ITERG, NS) ! debug4chapsim2
+        call wrt_3d_pt_debug(TEMPERATURE(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'T@bf st', ITERG, NS) ! debug4chapsim2
         
         !==================check=============
         !IF(NS==3) CALL CHK_EnegConsv_io
@@ -64,6 +66,8 @@
         !==================check=============
         !CALL CHK_EnegConsv_io
         !IF(MYID==0) WRITE(*,*) 'eneg conservation(final): NS ', NS, CHK_ENEG_CONSV0
+        call wrt_3d_pt_debug(TEMPERATURE(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'T@af st', ITERG, NS) ! debug4chapsim2
+        write(*,*) 'T-e', TEMPERATURE(1, 1:4, 1)
         
         RETURN
     END SUBROUTINE 

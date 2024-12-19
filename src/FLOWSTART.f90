@@ -50,7 +50,7 @@
                 IF (MYID.EQ.0) CALL CHKHDL('14.IO: Flow initialization from random velocity field', myid)  
                 
                 CALL RANDOM_FL_THEML_FLD_io
-                !CALL CALC_INITIALIZATION_io ! debug4chapsim2
+                CALL CALC_INITIALIZATION_io ! debug4chapsim2
             ELSE IF (RSTflg_io.EQ.1) THEN  !
                 !====NREAD=1 : from coarse mesh to fine mesh using extrapolation======
                 IF (MYID.EQ.0) &
@@ -103,16 +103,21 @@
         
         CALL CALL_TEC360
 
-        if(myid == 0) then        
-            write(*,*) 'init ux', Q_io(:, 8, 8, 1)!, Q_io(:, 1, 8, 1) !test
-            write(*,*) 'init uy', Q_io(:, 8, 8, 2)!, Q_io(:, 1, 8, 2) !test
-            write(*,*) 'init uz', Q_io(:, 8, 8, 3)!, Q_io(:, 1, 8, 3) !test
-        end if
+        ! if(myid == 0) then        
+        !     write(*,*) 'init ux', Q_io(:, 8, 8, 1)!, Q_io(:, 1, 8, 1) !test
+        !     write(*,*) 'init uy', Q_io(:, 8, 8, 2)!, Q_io(:, 1, 8, 2) !test
+        !     write(*,*) 'init uz', Q_io(:, 8, 8, 3)!, Q_io(:, 1, 8, 3) !test
+        ! end if
 
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@bf solv', 0, 0) ! debug4chapsim2
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@bf solv', 0, 0) ! debug4chapsim2
-        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@bf solv', 0, 0) ! debug4chapsim2
-        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@bf solv', 0, 0) ! debug4chapsim2   
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'qx@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'qy@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'qz@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    '', 'pr@bf solv', 0, 0) ! debug4chapsim2
+        IF(thermlflg==1) then
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'gx@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'gy@bf solv', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'gz@bf solv', 0, 0) ! debug4chapsim2
+        end if
         
         IF(PPROCESSONLY.eq.1) THEN
             CALL MPI_BARRIER(ICOMM,IERROR)

@@ -48,9 +48,9 @@
         MP = MPEROD + 1
         NP = NPEROD + 1
       
-        L = NCL1_io
-        M = NCL3
-        NG= NCL2
+        L = NCL1_io ! L: dim-x
+        M = NCL3    ! M: dim-z
+        NG= NCL2    ! N: dim-y
         NL= N2DO(MYID)
         ML= N3DO(MYID)
       

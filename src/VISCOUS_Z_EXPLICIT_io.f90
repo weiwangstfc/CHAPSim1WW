@@ -80,7 +80,6 @@
                        
                        ! at (i,   j,k')
                        DTAU31DX = (TAU31F-TAU31B)*COE1
-                       
                        !================DY_TAU_32=====================================
                        ! at (i,j'+1,k')
                        !VIS32P = ( VISCOUSITY(IC,JP,KC) + VISCOUSITY(IC,JP,KM) ) * YCL2ND_WFF(JJP) + &
@@ -102,68 +101,11 @@
                        DTAU32DY = (TAU32F-TAU32B)*COE2
                        
                         !================D_TAU_Z DIRECTION=================================
-                        !RHSLLPHI_io(IC,JC,KC) = RHSLLPHI_io(IC,JC,KC) + DTAU31DX + DTAU32DY + DTAU33DZ
+                       RHSLLPHI_io(IC,JC,KC) = RHSLLPHI_io(IC,JC,KC) + DTAU31DX + DTAU32DY + DTAU33DZ
                        
-                       !IF(JJ==2 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'viscz',&
-                        !DTAU31DX ,DTAU32DY,DTAU33DZ,RHS_io(IC,JC,KC)
- ! test
- !================DZ_TAU_33=====================================
-                       ! at (i,j,k  )
-                       DWDZ   = ( Q_io(IC,JC,KP,3) - Q_io(IC,JC,KC,3) ) * DZI 
-                       TAU33F = DWDZ !0.5_wp*( VISCOUSITY0(IC,JC,KC) + VISCOUSITY(IC,JC,KC) ) * ( DWDZ - DivU_io(IC,JC,KC) )
-                       
-                       ! at (i,j,k-1)
-                       DWDZ   = ( Q_io(IC,JC,KC,3) - Q_io(IC,JC,KM,3) ) * DZI 
-                       TAU33B = DWDZ !0.5_wp*( VISCOUSITY0(IC,JC,KM) + VISCOUSITY(IC,JC,KM) )* ( DWDZ - DivU_io(IC,JC,KM) )
-                       
-                       ! at (i,j,k')
-                       DTAU33DZ = (TAU33F-TAU33B)*COE3*0.5_WP
-                       
-                       !================DX_TAU_31=====================================
-                       ! at (i'+1,j,k')
-                       !VIS31P = ( VISCOUSITY(IP,JC,KC) + VISCOUSITY(IP,JC,KM) ) + &
-                       !         ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IC,JC,KM) ) 
-                       VIS31P = MU_STG(IP,JC,KC,2)
-                       DWDX = ( Q_io(IP,JC,KC,3) - Q_io(IC,JC,KC,3) ) * DXI
-                       DUDZ = ( Q_io(IP,JC,KC,1) - Q_io(IP,JC,KM,1) ) * DZI 
-                       TAU31F = DWDX !VIS31P * ( DWDX + DUDZ ) 
-                       ! at (i',  j,k')
-                       !VIS31C = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IC,JC,KM) ) + &
-                       !         ( VISCOUSITY(IM,JC,KC) + VISCOUSITY(IM,JC,KM) ) 
-                       VIS31C = MU_STG(IC,JC,KC,2)
-                       DWDX = ( Q_io(IC,JC,KC,3) - Q_io(IM,JC,KC,3) ) * DXI
-                       DUDZ = ( Q_io(IC,JC,KC,1) - Q_io(IC,JC,KM,1) ) * DZI 
-                       TAU31B = DWDX !VIS31C * ( DWDX + DUDZ ) 
-                       
-                       ! at (i,   j,k')
-                       DTAU31DX = (TAU31F-TAU31B)*COE1
-                       
-                       !================DY_TAU_32=====================================
-                       ! at (i,j'+1,k')
-                       !VIS32P = ( VISCOUSITY(IC,JP,KC) + VISCOUSITY(IC,JP,KM) ) * YCL2ND_WFF(JJP) + &
-                       !         ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IC,JC,KM) ) * YCL2ND_WFB(JJP)
-                       VIS32P = MU_STG(IC,JP,KC,3)
-                       DWDY   = ( Q_io(IC,JP,KC,3) - Q_io(IC,JC,KC,3) ) * DYCI(JJP)
-                       DVDZ   = ( Q_io(IC,JP,KC,2) - Q_io(IC,JP,KM,2) ) * DZI 
-                       TAU32F = DWDY !VIS32P * ( DWDY + DVDZ )
-                       
-                       ! at (i,j',  k')
-                       !VIS32C = ( VISCOUSITY(IC,JC,KC) + VISCOUSITY(IC,JC,KM) ) * YCL2ND_WFF(JJ) + &
-                       !         ( VISCOUSITY(IC,JM,KC) + VISCOUSITY(IC,JM,KM) ) * YCL2ND_WFB(JJ)
-                       VIS32C = MU_STG(IC,JC,KC,3)
-                       DWDY   = ( Q_io(IC,JC,KC,3) - Q_io(IC,JM,KC,3) ) * DYCI(JJ)
-                       DVDZ   = ( Q_io(IC,JC,KC,2) - Q_io(IC,JC,KM,2) ) * DZI 
-                       TAU32B = DWDY !VIS32C * ( DWDY + DVDZ )
-                       
-                       ! at (i,j,   k')
-                       DTAU32DY = (TAU32F-TAU32B)*COE2
-                       
-                        !================D_TAU_Z DIRECTION=================================
-                        RHSLLPHI_io(IC,JC,KC) = RHSLLPHI_io(IC,JC,KC) + DTAU31DX + DTAU32DY + DTAU33DZ
-                       
-                       !IF(JJ==2 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'viscz',&
-                        !DTAU31DX ,DTAU32DY,DTAU33DZ,RHS_io(IC,JC,KC)
-    ! end test                                       
+                       if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
+                       write(*,*) 'visz-123', DTAU31DX, DTAU32DY, DTAU33DZ
+                                                           
                     END DO
                 END DO
             END DO

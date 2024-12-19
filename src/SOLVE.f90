@@ -132,7 +132,7 @@
                     CALL VELOCITY_CALC_io
                     CALL SOLVERRK3_MOM_IO(NS)
                 END IF
-                stop  ! debug4chapsim2
+                !stop  ! debug4chapsim2
             END DO
             
             !===================================================
@@ -176,8 +176,8 @@
                 DT0HALF = DT0 !* 0.5_wp
             END IF
             
-            DT = DMIN1(DT0HALF,5.0_wp*DT,CFLGV/CFLMM) !DT can not exceed five times of the last step
-            DT = DMAX1(DT, DTMIN)
+            !DT = DMIN1(DT0HALF,5.0_wp*DT,CFLGV/CFLMM) !DT can not exceed five times of the last step
+            !DT = DMAX1(DT, DTMIN)
 
             COMMINFO(1) = REN
             COMMINFO(2) = CVISC
