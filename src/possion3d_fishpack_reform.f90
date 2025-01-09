@@ -1,4 +1,5 @@
 MODULE FISHPACK_POIS3D
+  use mpi_info
   USE WPRECISION
   
   INTEGER(4), save :: LPEROD, MPEROD, NPEROD
@@ -14,10 +15,15 @@ MODULE FISHPACK_POIS3D
   REAL(WP), ALLOCATABLE, save :: FR(:, :, :), FK(:, :, :), T(:)
   REAL(WP), ALLOCATABLE, save :: F_io   (:, :, :)
 
+
   private
   private :: FFTPACK_ROOT
   private :: TRID0
-  private :: FFTPACK_XZ
+  private :: FFTPACK_ROOT_1D
+  private :: FFTPACK_X1D
+  private :: FFTPACK_Z1D
+  private :: FFTPACK_XZ2D
+
   public :: FISHPACK_POIS3D_INIT
   public :: FISHPACK_POIS3D_SIMPLE
 
@@ -157,12 +163,15 @@ CONTAINS
 
     END SELECT
 
+    !if(myid==0) WRITE(*,*) 'WX :', myid, WX
+    !if(myid==0) WRITE(*,*) 'XRT:', myid, XRT
+
     RETURN
   END SUBROUTINE 
 
 !==========================================================================================================
 !==========================================================================================================
-  SUBROUTINE FFTPACK_X1D(IFWRD, MR, NR, LR, LP, WX, FR)
+  SUBROUTINE FFTPACK_X1D(IFWRD, LR, MR, NR, LP, WX, FR)
   ! FOR FFT TRANSFORM FROM SPACE TO WAVENUMBER, IFWRD = 1, IS = 1
   ! FOR FFT TRANSFORM FROM WAVENUMBER TO SPACE, IFWRD = 2, IS = -1
     IMPLICIT NONE
@@ -228,7 +237,7 @@ CONTAINS
   END SUBROUTINE
 !==========================================================================================================
 !==========================================================================================================
-  SUBROUTINE FFTPACK_Z1D(IFWRD, MR, NR, LR, MP, WY, FR)
+  SUBROUTINE FFTPACK_Z1D(IFWRD, LR, MR, NR, MP, WY, FR)
     ! FOR FFT TRANSFORM FROM SPACE TO WAVENUMBER, IFWRD = 1, IS = 1
   ! FOR FFT TRANSFORM FROM WAVENUMBER TO SPACE, IFWRD = 2, IS = -1
     IMPLICIT NONE
@@ -295,7 +304,7 @@ CONTAINS
     END SUBROUTINE
 !==========================================================================================================
 !==========================================================================================================
-  SUBROUTINE FFTPACK_XZ2D(IFWRD, MR, NR, LR, LP, MP, WX, WY, FR)
+  SUBROUTINE FFTPACK_XZ2D(IFWRD, LR, MR, NR, LP, MP, WX, WY, FR)
   ! FOR FFT TRANSFORM FROM SPACE TO WAVENUMBER, IFWRD = 1, IS = 1
   ! FOR FFT TRANSFORM FROM WAVENUMBER TO SPACE, IFWRD = 2, IS = -1
     IMPLICIT NONE
@@ -307,15 +316,15 @@ CONTAINS
 
     IF(IFWRD == 1) then
       !     TRANSFORM X FORWARD: PHY -> SPEC
-      CALL FFTPACK_X1D(IFWRD, MR, NR, LR, LP, WX, FR)
+      CALL FFTPACK_X1D(IFWRD, LR, MR, NR, LP, WX, FR)
       !     TRANSFORM Z FORWARD: PHY -> SPEC
-      CALL FFTPACK_Z1D(IFWRD, MR, NR, LR, MP, WY, FR)
+      CALL FFTPACK_Z1D(IFWRD, LR, MR, NR, MP, WY, FR)
 
     ELSE IF (IFWRD == 2) then
       !     TRANSFORM Z BACKWARD: SPEC -> PHY
-      CALL FFTPACK_Z1D(IFWRD, MR, NR, LR, MP, WY, FR)
+      CALL FFTPACK_Z1D(IFWRD, LR, MR, NR, MP, WY, FR)
       !     TRANSFORM X BACKWARD: SPEC -> PHY
-      CALL FFTPACK_X1D(IFWRD, MR, NR, LR, LP, WX, FR)
+      CALL FFTPACK_X1D(IFWRD, LR, MR, NR, LP, WX, FR)
     END IF
 
   END SUBROUTINE
@@ -323,22 +332,18 @@ CONTAINS
 
 !==========================================================================================================
 !==========================================================================================================
-  SUBROUTINE FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO, N3DO, DXQI, DZQI)
+  SUBROUTINE FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO, N3DO, DXQI, DZQI, AMPH, ACPH, APPH)
     !    SHOULD BE CALLED IN SLAVES BEFORE FIRSTLY
+    !use mpi_info
     IMPLICIT NONE
 
     INTEGER, INTENT(IN) :: BCX_io(2)
     INTEGER, INTENT(IN) :: BCZ(2)
     INTEGER, INTENT(IN) :: NCL1_io, NCL2, NCL3, N2DO, N3DO
+    REAL(WP), INTENT(IN) :: AMPH(:), ACPH(:), APPH(:)
     REAL(WP), INTENT(IN) :: DXQI, DZQI
-    
-    INTEGER, INTENT(OUT) :: LP, MP, NP
-    INTEGER, INTENT(OUT) :: L, M, NG, NL, ML
-    REAL(WP), INTENT(OUT) :: C1, C2
-
 
     INTEGER(4) :: K
-    INTEGER :: LPEROD, MPEROD, NPEROD
 
     IF(BCX_io(1) == 3 .AND. BCX_io(2) == 3 )  LPEROD = 0
     IF(BCX_io(1) == 1 .AND. BCX_io(2) == 1 )  LPEROD = 1
@@ -379,7 +384,7 @@ CONTAINS
     ALLOCATE (D (NG) ) ; D = 0.0_WP
     ALLOCATE (BB(NG) ) ; BB = 0.0_WP
 
-    MEMPC_Byte = MEMPC_Byte + NG*10 *8
+    !MEMPC_Byte = MEMPC_Byte + NG*10 *8
 
     ALLOCATE (XRT(L))  ; XRT = 0.0_WP
     ALLOCATE (YRT(M))  ; YRT = 0.0_WP
@@ -390,9 +395,9 @@ CONTAINS
     ALLOCATE (FK(L, ML, NG) ) ; FK = 0.0_WP
     ALLOCATE (T(MAX0(L, M, NG)) ) ; T = 0.0_WP
 
-    ALLOCATE ( F_io   (NCL1_io, NCL2, N3DO(0) )     )       ;  F_io = 0.0_WP
+    ALLOCATE ( F_io   (NCL1_io, NCL2, N3DO )     )       ;  F_io = 0.0_WP
 
-    MEMPC_Byte = MEMPC_Byte + (L+M + WSZ*2 +L * M * NL+L * ML * NG+MAX0(L, M, NG)) *8
+    !MEMPC_Byte = MEMPC_Byte + (L+M + WSZ*2 +L * M * NL+L * ML * NG+MAX0(L, M, NG)) *8
 
     DO K = 1, NG
         A(K) = AMPH(K)
@@ -412,16 +417,19 @@ CONTAINS
 
 !==========================================================================================================
 !==========================================================================================================
-  SUBROUTINE FISHPACK_POIS3D_SIMPLE(RHS, VAR)
+  SUBROUTINE FISHPACK_POIS3D_SIMPLE(RHS, VAR, KCL2G, RCCI2)
     !    CALLED IN SLAVES EVERY RK STAGE TO CALCULATE pressure CORRECTION TERMS.
-    USE mesh_info
-    USE init_info
+    !USE mesh_info
+    !USE init_info
     IMPLICIT NONE
-    REAL(WP), INTENT(INOUT) :: RHS (NCL1_io, N2DO(0), NCL3 )
-    REAL(WP), INTENT(OUT) :: VAR (NCL1_io, N2DO(0), NCL3 )
-    INTEGER(4) :: IFWRD
+    REAL(WP), INTENT(INOUT) :: RHS (:, :, :)
+    REAL(WP), INTENT(INOUT) :: VAR (1:L, 0:NL+1, 1:M)
+    INTEGER, INTENT(IN)     :: KCL2G(:)
+    REAL(WP), INTENT(IN)    :: RCCI2(:)
+    INTEGER(4) :: IFWRD 
     INTEGER(4) :: I, J, K, JJ
 
+!if(myid==0) WRITE(*,*)'fft-in ', RHS
     !   ======== RECONSTRUCT RHS TO FIT POIS3D.========
     DO I = 1, L
         DO K = 1, M
@@ -433,8 +441,8 @@ CONTAINS
 
     !   ========forward FFT IN X AND Z direction ========
     IFWRD = 1
-    CALL FFTPACK_XZ(IFWRD)
-
+    CALL FFTPACK_XZ2D(IFWRD, L, M, NL, LP, MP, WX, WY, FR)
+!if(myid==0) WRITE(*,*)'fft-step1 ', FR
     !   ======== RESTORE RHSLLPHI ========
     DO I = 1, L
         DO K = 1, M
@@ -446,11 +454,11 @@ CONTAINS
 
     !   ======== TRANSPORT Y- DECOMP TO K - DECOMP ========
     !CALL TRASP_Y2Z_RHSLLPHI_io
-    CALL TRASP23_Y2Z(NCL1_io, 1, N2DO(0), RHS, F_io)
-
+    CALL TRASP23_Y2Z(L, 1, NL, RHS, F_io)
+!if(myid==0) WRITE(*,*)'fft-step2 ', F_io
     !   ========CONSTRUCT DATA FOR TDMA========
     DO I = 1, L
-        DO K = 1, N3DO(MYID)
+        DO K = 1, ML
             DO J = 1, NG
                 FK(I, K, J) = F_io(I, J, K)
             END DO
@@ -459,14 +467,14 @@ CONTAINS
 
     !   ======== TDMA IN Y direction FOR PART OF FR(:,PART, :) ========
     DO I = 1, L
-        DO J = 1, N3DO(MYID)
+        DO J = 1, ML
             JJ = KCL2G(J)
             DO K = 1, NG
                 BB(K) = B(K) + XRT(I) / RCCI2(K) + YRT(JJ)
                 T(K) = FK(I, J, K)
             END DO
 
-            CALL TRID0
+            CALL TRID0(NG, A, BB, C, T)
 
             DO K = 1, NG
                 FK(I, J, K) = T(K)
@@ -476,8 +484,9 @@ CONTAINS
     END DO
 
     !      ======== RE -CONSTRUCT DATA BACK ========
+    !if(myid==0) WRITE(*,*)'fft-step3 ', FK
     DO I = 1, L
-        DO K = 1, N3DO(MYID)
+        DO K = 1, ML
             DO J = 1, NG
                 F_io(I, J, K) = FK(I, K, J)
             END DO
@@ -486,8 +495,8 @@ CONTAINS
 
     !   ======== TRANSPORT Z - DECOMP TO Y- DECOMP ========
     !CALL TRASP_Z2Y_RHSLLPHI_io
-    CALL TRASP23_Z2Y(NCL1_io, 1, N2DO(0), RHS, F_io)
-
+    CALL TRASP23_Z2Y(L, 1, NL, RHS, F_io)
+ !if(myid==0) WRITE(*,*)'fft-step4 ', RHS
     !   ======== RESTORE RHSLLPHI ========
     DO I = 1, L
         DO K = 1, M
@@ -499,8 +508,9 @@ CONTAINS
 
     !   ========backward FFT IN Z AND X directionS ========
     IFWRD = 2
-    CALL FFTPACK_XZ(IFWRD)
-
+    !CALL FFTPACK_XZ(IFWRD)
+    CALL FFTPACK_XZ2D(IFWRD, L, M, NL, LP, MP, WX, WY, FR)
+!if(myid==0) WRITE(*,*)'fft-step5 ', FR
     !   ======== SCALE THE CALCULATED VALUE ========
     DO I = 1, L
         DO J = 1, M
@@ -510,200 +520,23 @@ CONTAINS
         END DO
     END DO
 
-
+!if(myid==0) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
+!if(myid==1) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
     !   ======== RE -STORE AND ASSIGN DATA TO DPH ========
     VAR = 0.0_WP
     DO I = 1, L
         DO K = 1, M
             DO J = 1, NL
               VAR(I, J, K) = FR(I, K, J)
-            END DO
+              !if(myid==0) WRITE(*,*) I, K, J, VAR(I,J,K), FR(I,K,J)
+           END DO
         END DO
     END DO
+        !if(myid==0) WRITE(*,*)'fft-out', myid, var
+        !if(myid==1) WRITE(*,*)'fft-out', myid, var
 
     RETURN
 
   END SUBROUTINE
 
 END MODULE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-SUBROUTINE FFTPACK_ROOT(L, M, LP, MP, C1, C2, WX, WY, XRT, YRT)
-  ! Generate FFT transform roots for X and Y directions
-  ! Arguments:
-  !   L, M    (INTEGER(4), IN): Grid dimensions in X and Y directions
-  !   LP, MP  (INTEGER(4), IN): Parameters determining transform type
-  !   C1, C2  (REAL(WP), IN): Scaling factors for X and Y transforms
-  !   WX, WY  (REAL(WP), DIMENSION(:), INOUT): Work arrays for FFT
-  !   XRT, YRT (REAL(WP), DIMENSION(:), OUT): Transform roots for X and Y
-
-  IMPLICIT NONE
-
-  ! Arguments
-  INTEGER(4), INTENT(IN) :: L, M, LP, MP
-  REAL(WP), INTENT(IN) :: C1, C2
-  REAL(WP), DIMENSION(:), INTENT(INOUT) :: WX, WY
-  REAL(WP), DIMENSION(:), INTENT(OUT) :: XRT, YRT
-
-  ! Local variables
-  REAL(WP) :: PI, DX, DI, DY, DJ, SCALX, SCALY
-  INTEGER(4) :: LR, MR, LRDEL, MRDEL, I, J
-
-  ! Compute PI
-  PI = 2.0_WP * DASIN(1.0_WP)
-
-  !-----------------------------------------------------------
-  ! X direction transform roots
-  !-----------------------------------------------------------
-  LR = L
-  LRDEL = ((LP - 1) * (LP - 3) * (LP - 5)) / 3
-  SCALX = DBLE(LR + LRDEL)
-  DX = PI / (2.0_WP * SCALX)
-
-  SELECT CASE (LP)
-  CASE (1)
-    ! RFFTI     INITIALIZE  RFFTF AND RFFTB
-    ! RFFTF     FORWARD TRANSFORM OF A REAL PERIODIC SEQUENCE
-    ! RFFTB     BACKWARD TRANSFORM OF A REAL COEFFICIENT ARRAY
-    XRT(1) = 0.0_WP
-    XRT(LR) = -4.0_WP * C1
-    DO I = 3, LR, 2
-      XRT(I - 1) = -4.0_WP * C1 * (DSIN(DBLE((I - 1)) * DX))**2
-      XRT(I) = XRT(I - 1)
-    END DO
-    CALL RFFTI(LR, WX)
-
-  CASE (2)
-    ! SINTI     INITIALIZE SINT
-    ! SINT      SINE TRANSFORM OF A REAL ODD SEQUENCE
-    DI = 0.00_WP
-    DO I = 1, LR
-      XRT(I) = -4.0_WP * C1 * (DSIN((DBLE(I) - DI) * DX))**2
-    END DO
-    SCALX = 2.0_WP * SCALX
-    CALL SINTI (LR, WX)
-
-  CASE (3)
-   ! SINQI     INITIALIZE SINQF AND SINQB
-   ! SINQF     FORWARD SINE TRANSFORM WITH ODD WAVE NUMBERS
-   ! SINQB     UNNORMALIZED INVERSE OF SINQF
-    DI = 0.50_WP
-    SCALX = 2.0_WP * SCALX
-    DO I = 1, LR
-      XRT(I) = -4.0_WP * C1 * (DSIN((DBLE(I) - DI) * DX))**2
-    ENDDO
-    SCALX = 2.0_WP * SCALX
-    CALL SINQI (LR, WX)
-
-  CASE (4)
-   ! COSTI     INITIALIZE COST
-   ! COST      COSINE TRANSFORM OF A REAL EVEN SEQUENCE
-    DI = 1.00_WP
-    DO I = 1, LR
-        XRT(I) = -4.0_WP * C1 * (DSIN((DBLE(I) - DI) * DX))**2
-    END DO
-    SCALX = 2.0_WP * SCALX
-    CALL COSTI (LR, WX)
-
-  CASE (5)
-   ! COSQI     INITIALIZE COSQF AND COSQB
-   ! COSQF     FORWARD COSINE TRANSFORM WITH ODD WAVE NUMBERS
-   ! COSQB     UNNORMALIZED INVERSE OF COSQF
-    DI = 0.50_WP
-    SCALX = 2.0_WP * SCALX
-    DO I = 1, LR
-      XRT(I) = -4.0_WP * C1 * (DSIN((DBLE(I) - DI) * DX))**2
-    END DO
-    SCALX = 2.0_WP * SCALX
-    CALL COSQI (LR, WX)
-
-  END SELECT
-
-  !-----------------------------------------------------------
-  ! Y direction transform roots
-  !-----------------------------------------------------------
-  MR = M
-  MRDEL = ((MP - 1) * (MP - 3) * (MP - 5)) / 3
-  SCALY = DBLE(MR + MRDEL)
-  DY = PI / (2.0_WP * SCALY)
-
-  SELECT CASE (MP)
-  CASE (1)
-    YRT(1) = 0.0_WP
-    YRT(MR) = -4.0_WP * C2
-    DO J = 3, MR, 2
-      YRT(J - 1) = -4.0_WP * C2 * (DSIN(DBLE((J - 1)) * DY))**2
-      YRT(J) = YRT(J - 1)
-    END DO
-    CALL RFFTI (MR, WY)
-
-  CASE (2)
-    DJ = 0.00_WP
-    DO J = 1, MR
-      YRT(J) = -4.0_WP * C2 * (DSIN((DBLE(J) - DJ) * DY))**2
-    ENDDO
-    SCALY = 2.0_WP * SCALY
-    CALL SINTI (MR, WY)
-
-  CASE (3)
-    DJ = 0.50_WP
-    SCALY = 2.0_WP * SCALY
-    DO J = 1, MR
-      YRT(J) = -4.0_WP * C2 * (DSIN((DBLE(J) - DJ) * DY))**2
-    ENDDO
-    SCALY = 2.0_WP * SCALY
-    CALL SINQI (MR, WY)
-
-  CASE (4)
-    DJ = 1.00_WP
-    DO J = 1, MR
-      YRT(J) = -4.0_WP * C2 * (DSIN((DBLE(J) - DJ) * DY))**2
-    ENDDO
-    SCALY = 2.0_WP * SCALY
-    CALL COSTI (MR, WY)
-
-  CASE (5)
-    DJ = 0.50_WP
-    SCALY = 2.0_WP * SCALY
-    DO J = 1, MR
-      YRT(J) = -4.0_WP * C2 * (DSIN((DBLE(J) - DJ) * DY))**2
-    ENDDO
-    SCALY = 2.0_WP * SCALY
-    CALL COSQI (MR, WY)
-
-  END SELECT
-
-
-  RETURN
-END SUBROUTINE FFTPACK_ROOT

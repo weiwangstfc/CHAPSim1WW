@@ -87,7 +87,7 @@ else ifeq ($(cfg), intel)
     FOPT4 = -Og -g -traceback -check all -check bounds  
 
 else
-    FOPT12 = -O2 -fallow-argument-mismatch -fbacktrace
+    FOPT12 = -O2 -fallow-argument-mismatch -fbacktrace -fcheck=no-array-temps
     FOPT3 =  -O2 
     FOPT4 =  -O2   
 
@@ -96,7 +96,6 @@ endif
 OBJ1= \
         modules.o\
         MEMALLOCT.o\
-        DNS_THERMAL.o\
         BC_COUTLET_ENEG_RK3.o\
         BC_COUTLET_MOM_RK3.o\
         BC_WALL.o\
@@ -124,7 +123,7 @@ OBJ1= \
         MASSFLUX_CALC_IO.o\
         mesh_decomp.o\
         possion3d_FFT99.o\
-        possion3d_fishpack.o\
+        possion3d_fishpack_reform.o\
         MOMFA_tg.o\
         MOMFA_io.o\
         PRESSURE_CORRECTION.o\
@@ -138,7 +137,7 @@ OBJ1= \
         SOLVERRK3_MOM_tg.o\
         start_mpi.o\
         TDMAIJI_CYC.o\
-	TDMAIJJ_CYC.o\
+	      TDMAIJJ_CYC.o\
         TDMAIJI_nonCYC.o\
         TDMAIJJ_nonCYC.o\
         THERM_PROP_UPDATE.o\
@@ -149,6 +148,7 @@ OBJ1= \
         VISCOUS_Z_EXPLICIT_io.o\
         VMAV.o\
         WRTHDL.o\
+				DNS_THERMAL.o\
 
 OBJ2= \
         CHK_conservation.o\

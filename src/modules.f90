@@ -4,8 +4,8 @@
     END MODULE WPRECISION
 !************************************************************************
     MODULE mpi_info
-        !include 'mpif.h'
-        use MPI
+        include 'mpif.h'
+        !use MPI
      
         INTEGER(4) ::  MYID
         INTEGER(4) ::  IERROR
@@ -95,6 +95,7 @@
         LOGICAL    ::  TGFLOWflg, IOFLOWflg
         
         INTEGER(4) :: MEMPC_byte = 0  ! memory per core in the unit of byte
+        integer :: fishpack 
       
       END MODULE cparam
 !********************************MODULE**********************************

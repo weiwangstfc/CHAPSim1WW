@@ -23,7 +23,6 @@
 !**********************************************************************
     SUBROUTINE start_mpi
         use mpi_info
-        use MPI
         IMPLICIT NONE   
          
         INTEGER  :: NDIM11

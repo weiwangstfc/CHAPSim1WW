@@ -101,8 +101,8 @@
                        DTAU23DZ = (TAU23F-TAU23B)*COE3
                        !================D_TAU_Y DIRECTION=================================
                        DPH_io(IC,JC,KC)= DPH_io(IC,JC,KC) + DTAU21DX + DTAU22DY + DTAU23DZ
-                       if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
-                        write(*,*) 'visy-123', DTAU21DX, DTAU22DY, DTAU23DZ, DTAU22DD
+                       !if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
+                       ! write(*,*) 'visy-123', DTAU21DX, DTAU22DY, DTAU23DZ, DTAU22DD
 !
                     END DO
                 END DO

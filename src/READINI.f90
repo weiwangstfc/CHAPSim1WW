@@ -36,6 +36,7 @@
         
         
         PI=2.0_WP*(DASIN(1.0_WP))
+        fishpack = 1
         
         IF(MYID.NE.0) RETURN !   
        

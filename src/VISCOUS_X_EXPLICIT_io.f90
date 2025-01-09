@@ -104,8 +104,8 @@
                     !================D_TAU_X DIRECTION=================================
                     Qtmp_io(IC,JC,KC) = Qtmp_io(IC,JC,KC) + DTAU11DX + DTAU12DY + DTAU13DZ
 
-                    if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
-                    write(*,*) 'visx-123', DTAU11DX, DTAU12DY, DTAU13DZ
+                    !if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
+                    !write(*,*) 'visx-123', DTAU11DX, DTAU12DY, DTAU13DZ
         
                 END DO
             END DO

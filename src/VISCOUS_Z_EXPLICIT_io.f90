@@ -103,8 +103,8 @@
                         !================D_TAU_Z DIRECTION=================================
                        RHSLLPHI_io(IC,JC,KC) = RHSLLPHI_io(IC,JC,KC) + DTAU31DX + DTAU32DY + DTAU33DZ
                        
-                       if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
-                       write(*,*) 'visz-123', DTAU31DX, DTAU32DY, DTAU33DZ
+                       !if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
+                       !write(*,*) 'visz-123', DTAU31DX, DTAU32DY, DTAU33DZ
                                                            
                     END DO
                 END DO

@@ -1,5 +1,6 @@
 !***********************************************************************  
     MODULE FISHPACK_POIS3D_INFO
+        use mpi_info
         USE WPRECISION
    
         INTEGER(4) :: LPEROD, MPEROD, NPEROD
@@ -151,6 +152,8 @@
   111   CALL COSQI (LR,WX)
   112   CONTINUE
 
+    !if(myid==0) WRITE(*,*) 'WX :', myid, WX
+    !if(myid==0) WRITE(*,*) 'XRT:', myid, XRT
 !C
 !C     GENERATE TRANSFORM ROOTS FOR Y DIRECTION (Z IN REAL)
 !C  
@@ -186,6 +189,9 @@
   123 CALL COSQI (MR,WY)
   124 CONTINUE
 
+    !if(myid==0)WRITE(*,*) 'WY :', myid, WY
+    !if(myid==0)WRITE(*,*) 'YRT:', myid, YRT
+
      RETURN  
      
      END SUBROUTINE
@@ -202,7 +208,8 @@
       
         INTEGER(4) :: IFWRD
         INTEGER(4) :: I, J, K, JJ
-     
+
+     !if(myid==0) WRITE(*,*)'fft-in ', RHSLLPHI_io
 !     ========RECONSTRUCT RHS TO FIT POIS3D.========
         DO I=1,L
             DO K=1,M
@@ -215,7 +222,7 @@
 !     ========FORWARD FFT IN X AND Z DIRECTION========
         IFWRD = 1
         CALL FFTPACK_XZ(IFWRD)
-      
+       !if(myid==0) WRITE(*,*)'fft-step1 ', FR
 !     ========RESTORE RHSLLPHI========
         DO I=1,L
             DO K=1,M
@@ -228,7 +235,7 @@
 !     ========TRANSPORT Y-DECOMP TO K-DECOMP========
         !CALL TRASP_Y2Z_RHSLLPHI_io
         CALL TRASP23_Y2Z(NCL1_IO, 1, N2DO(0), RHSLLPHI_io, F_IO)
-      
+      !if(myid==0) WRITE(*,*)'fft-step2 ', F_io
 !     ========CONSTRUCT DATA FOR TDMA========
         DO I=1,L
             DO K=1,N3DO(MYID)
@@ -257,6 +264,7 @@
         END DO
 
 !        ========RE-CONSTRUCT DATA BACK========
+!if(myid==0) WRITE(*,*)'fft-step3 ', FK
         DO I=1,L
             DO K=1,N3DO(MYID)
                 DO J=1,NG
@@ -268,20 +276,20 @@
 !     ========TRANSPORT Z-DECOMP TO Y-DECOMP========
         !CALL TRASP_Z2Y_RHSLLPHI_io  
         CALL TRASP23_Z2Y(NCL1_IO, 1, N2DO(0), RHSLLPHI_io, F_io)
-        
+        !if(myid==0) WRITE(*,*)'fft-step4 ', RHSLLPHI_io
 !     ========RESTORE RHSLLPHI========
         DO I=1,L
             DO K=1,M
                 DO J=1,NL
                     FR(I,K,J) = RHSLLPHI_io(I,J,K) 
-                END DO
+               END DO
             END DO
         END DO 
       
 !     ========BACKWARD FFT IN Z AND X DIRECTIONS========
         IFWRD = 2
         CALL FFTPACK_XZ(IFWRD)
-      
+      !if(myid==0) WRITE(*,*)'fft-step5 ', FR
 !     ========SCALE THE CALCULATED VALUE========
         DO 167 I=1,L
             DO 166 J=1,M
@@ -291,17 +299,20 @@
   166        CONTINUE
   167   CONTINUE
   
-  
+  !if(myid==0) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
+  !if(myid==1) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
 !     ========RE-STORE AND ASSIGN DATA TO DPH========
         DPH_IO = 0.0_WP
         DO I=1,L
             DO K=1,M
                 DO J=1,NL
                     DPH_io(I,J,K) = FR(I,K,J)
+                    !if(myid==0) WRITE(*,*) I, K, J, DPH_io(I,J,K), FR(I,K,J)
                 END DO
             END DO
         END DO  
-        
+        !if(myid==0) WRITE(*,*)'fft-out', myid, DPH_io
+        !if(myid==1) WRITE(*,*)'fft-out', myid, DPH_io
         RETURN
       
     END SUBROUTINE

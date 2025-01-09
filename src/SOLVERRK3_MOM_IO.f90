@@ -4,6 +4,7 @@
         use mesh_info
         use flow_info
         use init_info
+        use FISHPACK_POIS3D
         IMPLICIT NONE
         INTEGER(4),INTENT(IN) :: NS
         INTEGER(4) :: IDR
@@ -96,11 +97,22 @@
         !CALL DEBUG_WRT_LOCAL(RHSLLPHI_io,1,N2DO(MYID),'divg') !test
         
         IF(TGFLOWFLG) THEN
-            CALL FISHPACK_POIS3D_SIMPLE
+            if(fishpack==1) then
+              CALL FISHPACK_POIS3D_SIMPLE(RHSLLPHI_tg, DPH_tg, KCL2G, RCCI2)
+            else
+              CALL FISHPACK_POIS3D_SIMPLE(RHSLLPHI_tg, DPH_tg, KCL2G, RCCI2)
+            end if
         ELSE
-            CALL FFT99_POIS3D_periodicxz(IIO) !Method One 
-            !CALL FISHPACK_POIS3D_SIMPLE ! Method Two,  good
+            !CALL FFT99_POIS3D_periodicxz(IIO) !Method One 
+            if(fishpack==1) then
+              CALL FISHPACK_POIS3D_SIMPLE(RHSLLPHI_io, DPH_io, KCL2G, RCCI2) ! Method Two,  good
+            else
+              CALL FISHPACK_POIS3D_SIMPLE(RHSLLPHI_io, DPH_io, KCL2G, RCCI2)
+              !CALL FFT99_POIS3D_periodicxz(IIO)
+            end if
         END IF
+
+        if(myid==0) WRITE(*,*) 'phi', DPH_io
         
         CALL INTFC_VARS1(1,NCL1_io,NCL1S,NCL1E,DPH_io)
         CALL BC_WALL_DPH_io

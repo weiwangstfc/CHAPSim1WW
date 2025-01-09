@@ -400,7 +400,7 @@
         character(128) :: FLNM
         logical :: file_exists
         integer :: n, i, j, k, jj
-
+RETURN ! test
         a = (/1, 1, 1, 1, 8, 8, 8, 8, &
         1, 2, 3, 4, 1, 2, 3, 4, &
         1, 1, 1, 1, 8, 8, 8, 8/)

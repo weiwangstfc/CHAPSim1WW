@@ -236,7 +236,7 @@
             ELSE
             END IF  
             if(myid==0) then
-                write(*,*) 'compensition', DPGRNS
+                !write(*,*) 'compensition', DPGRNS
                 !write(*,*) 'rhsx:', RHS_io(:, 1, 1), RHS_io(:, 4, 4)
             end if
             CALL MPI_BCAST( DPGRNS, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )

@@ -100,6 +100,8 @@
 
     PROGRAM DNS_THERMAL
         use init_info
+        use mesh_info
+        use FISHPACK_POIS3D
         IMPLICIT NONE  
                    
 !>      !===============CODE STARTES=========================================================================
@@ -155,12 +157,21 @@
         IF (MYID.EQ.0) CALL CHKHDL('11.Initialization of FFT solver...',myid) 
         IF(TGFLOWflg .AND. IOFLOWflg) THEN
             CALL FFT99_POIS3D_INIT(ITG)
-            CALL FISHPACK_POIS3D_INIT
+            if(fishpack==1) then
+              CALL FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO(MYID), N3DO(MYID), DXQI, DZQI, AMPH, ACPH, APPH)
+            else
+              CALL FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO(MYID), N3DO(MYID), DXQI, DZQI, AMPH, ACPH, APPH)
+            end if
         ELSE
             IF(TGFLOWflg) CALL FFT99_POIS3D_INIT(ITG)
             IF(IOFLOWflg) THEN
-                CALL FFT99_POIS3D_INIT(IIO) !Method One
-                !CALL FISHPACK_POIS3D_INIT  !Metthod Two, good
+                !CALL FFT99_POIS3D_INIT(IIO) !Method One
+              if(fishpack==1) then
+                CALL FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO(MYID), N3DO(MYID), DXQI, DZQI, AMPH, ACPH, APPH)  !Metthod Two, good
+              else
+                CALL FISHPACK_POIS3D_INIT(BCX_io, BCZ, NCL1_io, NCL2, NCL3, N2DO(MYID), N3DO(MYID), DXQI, DZQI, AMPH, ACPH, APPH)  !Metthod Two, good
+                !CALL FFT99_POIS3D_INIT(IIO)
+              end if
             END IF
         END IF
         
