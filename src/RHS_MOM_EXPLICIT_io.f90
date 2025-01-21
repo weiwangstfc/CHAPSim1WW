@@ -116,7 +116,9 @@
                     ENDDO
                 ENDDO
             ENDDO
+#ifdef DEBUG
             call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPX@af st', ITERG, NS) ! debug4chapsim2
+#endif
         ELSE IF (IDR.EQ.2) THEN 
             
             DO JC=NYI,N2DO(MYID)
@@ -136,7 +138,9 @@
                     ENDDO
                 ENDDO
             ENDDO    
+#ifdef DEBUG
             call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPY@af st', ITERG, NS) ! debug4chapsim2  
+#endif
         ELSE IF (IDR.EQ.3) THEN
             COE2 = TALP(NS)* DT*DZI
             DO KC=1,NCL3
@@ -154,7 +158,9 @@
                     ENDDO
                 ENDDO
             ENDDO  
+#ifdef DEBUG
             call wrt_3d_pt_debug(RHS_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3), '', 'ConVisPZ@af st', ITERG, NS) ! debug4chapsim2
+#endif
         ELSE       
         ENDIF
         

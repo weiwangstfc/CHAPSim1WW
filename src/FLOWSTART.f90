@@ -108,7 +108,7 @@
         !     write(*,*) 'init uy', Q_io(:, 8, 8, 2)!, Q_io(:, 1, 8, 2) !test
         !     write(*,*) 'init uz', Q_io(:, 8, 8, 3)!, Q_io(:, 1, 8, 3) !test
         ! end if
-
+#ifdef DEBUG
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'qx@bf solv', 0, 0) ! debug4chapsim2
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'qy@bf solv', 0, 0) ! debug4chapsim2
         call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'qz@bf solv', 0, 0) ! debug4chapsim2
@@ -118,7 +118,8 @@
         call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'gy@bf solv', 0, 0) ! debug4chapsim2
         call wrt_3d_pt_debug(G_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'gz@bf solv', 0, 0) ! debug4chapsim2
         end if
-        
+        STOP ! test
+#endif
         IF(PPROCESSONLY.eq.1) THEN
             CALL MPI_BARRIER(ICOMM,IERROR)
             IF(MYID==0) CALL CHKHDL('<===Only postprocessed results, now the code stops...==>', myid)  
@@ -126,6 +127,8 @@
         END IF
 
         !call TEST_POISSON  ! debug4chapsim2
+
+        STOP ! test
 
         
         

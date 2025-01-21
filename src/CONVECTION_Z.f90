@@ -186,6 +186,9 @@
                     RHSLLPHI_io(IC,JC,KC) = -(H31+H32+H33)     !H for momentum Z direction. 
                     
                     !IF(JJ==1 .and. IC==1 .and. KC==1) write(*,'(A,4ES13.5)') 'convz',H31,H32,H33,RHSLLPHI_io(IC,JC,KC)
+#ifdef DEBUG
+  if(myid==0 .and. ic==1 .and. kc==1 .and. jc<=4) write(*,*) 'conz-31,32,33', JC, -H31, -H32, -H33
+#endif
                 END DO
             
             END DO

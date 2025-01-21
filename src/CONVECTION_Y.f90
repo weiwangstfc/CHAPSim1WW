@@ -215,6 +215,9 @@
                     DPH_io(IC,JC,KC) = -(H21+H22+H23)   !H for momentum y direction.
                     ! IF(myid==0 .and. JJ<=4 .and. IC==4 .and. KC==4) &
                     ! write(*,*) 'convy', JJ, H21,H22,H23,DPH_io(IC,JC,KC)
+#ifdef DEBUG
+  if(myid==0 .and. ic==1 .and. kc==1 .and. jc<=4) write(*,*) 'cony-21,22,23', JC, -H21, -H22, -H23
+#endif
                 END DO
             END DO
         END DO

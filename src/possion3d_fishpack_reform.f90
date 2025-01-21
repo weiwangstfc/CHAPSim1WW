@@ -5,12 +5,12 @@ MODULE FISHPACK_POIS3D
   INTEGER(4), save :: LPEROD, MPEROD, NPEROD
   INTEGER(4), save :: LP, MP, NP
   INTEGER(4), save :: L, M, NG, NL, ML
-  INTEGER(4), save :: LDIMF, MDIMF
+  !INTEGER(4), save :: LDIMF, MDIMF
   INTEGER(4), save :: WSZ
 
   REAL(WP), save :: C1, C2
   REAL(WP), save :: SCALX, SCALY
-  REAL(WP), ALLOCATABLE, save :: A(:), B(:), C(:), D(:), BB(:)
+  REAL(WP), ALLOCATABLE, save :: A(:), B(:), C(:), BB(:) !, D(:)
   REAL(WP), ALLOCATABLE, save :: XRT(:), YRT(:), WX(:), WY(:)
   REAL(WP), ALLOCATABLE, save :: FR(:, :, :), FK(:, :, :), T(:)
   REAL(WP), ALLOCATABLE, save :: F_io   (:, :, :)
@@ -86,8 +86,8 @@ CONTAINS
     INTEGER(4), INTENT(IN) :: L, LP
     REAL(WP), INTENT(IN) :: C1
     REAL(WP), INTENT(OUT) :: SCALX
-    REAL(WP), DIMENSION(:), INTENT(OUT) :: WX
-    REAL(WP), DIMENSION(:), INTENT(OUT) :: XRT
+    REAL(WP), DIMENSION(:), INTENT(INOUT) :: WX
+    REAL(WP), DIMENSION(:), INTENT(INOUT) :: XRT
     
 
     ! Local variables
@@ -96,6 +96,8 @@ CONTAINS
 
     ! Compute PI
     PI = 2.0_WP * DASIN(1.0_WP)
+    WX = 0.0_WP
+    XRT = 0.0_WP
     !-----------------------------------------------------------
     ! X direction transform roots
     !-----------------------------------------------------------
@@ -375,21 +377,21 @@ CONTAINS
     C1 = DXQI
     C2 = DZQI
 
-    WSZ = 30 + L + M + 2 * NG + MAX(L, M, NG) + &
-                7*(INT((L+1)/2) + INT((M+1)/2)) + 128
+    !WSZ = 30 + L + M + 2 * NG + MAX(L, M, NG) + &
+    !            7*(INT((L+1)/2) + INT((M+1)/2)) + 128
 
     ALLOCATE (A (NG) ) ; A = 0.0_WP
     ALLOCATE (B (NG) ) ; B = 0.0_WP
     ALLOCATE (C (NG) ) ; C = 0.0_WP
-    ALLOCATE (D (NG) ) ; D = 0.0_WP
+    !ALLOCATE (D (NG) ) ; D = 0.0_WP
     ALLOCATE (BB(NG) ) ; BB = 0.0_WP
 
     !MEMPC_Byte = MEMPC_Byte + NG*10 *8
 
     ALLOCATE (XRT(L))  ; XRT = 0.0_WP
     ALLOCATE (YRT(M))  ; YRT = 0.0_WP
-    ALLOCATE (WX(WSZ)) ; WX = 0.0_WP
-    ALLOCATE (WY(WSZ)) ; WY = 0.0_WP
+    ALLOCATE (WX(2*L+15)) ; WX = 0.0_WP
+    ALLOCATE (WY(2*M+15)) ; WY = 0.0_WP
 
     ALLOCATE (FR(L, M, NL) ) ; FR = 0.0_WP
     ALLOCATE (FK(L, ML, NG) ) ; FK = 0.0_WP
@@ -404,12 +406,21 @@ CONTAINS
         B(K) = ACPH(K)
         C(K) = APPH(K)
     END DO
-
+if(myid==0) then
+      open(224, file = 'check_mesh_abc.dat') 
+      write(224, *) 'index, a, b, c'
+      do k = 1, ng
+        write (224, *) k, a(k), b(k), c(k)
+      end do
+      close(224)
+end if
     ! Build up fft root for x
     CALL FFTPACK_ROOT_1D(L, LP, C1, SCALX, WX, XRT)
     ! Build up fft root for y (z in this code)
     CALL FFTPACK_ROOT_1D(M, MP, C2, SCALY, WY, YRT)
-
+if(myid==0) WRITE(*,*)'fft-scl ', SCALX, SCALY
+if(myid==0) WRITE(*,*)'fft-xrt  ', XRT
+if(myid==0) WRITE(*,*)'fft-zrt  ', YRT
     RETURN
 
   END SUBROUTINE
@@ -429,7 +440,7 @@ CONTAINS
     INTEGER(4) :: IFWRD 
     INTEGER(4) :: I, J, K, JJ
 
-!if(myid==0) WRITE(*,*)'fft-in ', RHS
+if(myid==0) WRITE(*,*)'fft-in ', RHS
     !   ======== RECONSTRUCT RHS TO FIT POIS3D.========
     DO I = 1, L
         DO K = 1, M
@@ -442,7 +453,7 @@ CONTAINS
     !   ========forward FFT IN X AND Z direction ========
     IFWRD = 1
     CALL FFTPACK_XZ2D(IFWRD, L, M, NL, LP, MP, WX, WY, FR)
-!if(myid==0) WRITE(*,*)'fft-step1 ', FR
+
     !   ======== RESTORE RHSLLPHI ========
     DO I = 1, L
         DO K = 1, M
@@ -451,11 +462,10 @@ CONTAINS
             END DO
         END DO
     END DO
-
     !   ======== TRANSPORT Y- DECOMP TO K - DECOMP ========
     !CALL TRASP_Y2Z_RHSLLPHI_io
     CALL TRASP23_Y2Z(L, 1, NL, RHS, F_io)
-!if(myid==0) WRITE(*,*)'fft-step2 ', F_io
+if(myid==0) WRITE(*,*)'fft-xzfft ', F_io
     !   ========CONSTRUCT DATA FOR TDMA========
     DO I = 1, L
         DO K = 1, ML
@@ -484,7 +494,6 @@ CONTAINS
     END DO
 
     !      ======== RE -CONSTRUCT DATA BACK ========
-    !if(myid==0) WRITE(*,*)'fft-step3 ', FK
     DO I = 1, L
         DO K = 1, ML
             DO J = 1, NG
@@ -492,11 +501,10 @@ CONTAINS
             END DO
         END DO
     END DO
-
+if(myid==0) WRITE(*,*)'fft-ytdma ', FK
     !   ======== TRANSPORT Z - DECOMP TO Y- DECOMP ========
     !CALL TRASP_Z2Y_RHSLLPHI_io
     CALL TRASP23_Z2Y(L, 1, NL, RHS, F_io)
- !if(myid==0) WRITE(*,*)'fft-step4 ', RHS
     !   ======== RESTORE RHSLLPHI ========
     DO I = 1, L
         DO K = 1, M
@@ -510,7 +518,7 @@ CONTAINS
     IFWRD = 2
     !CALL FFTPACK_XZ(IFWRD)
     CALL FFTPACK_XZ2D(IFWRD, L, M, NL, LP, MP, WX, WY, FR)
-!if(myid==0) WRITE(*,*)'fft-step5 ', FR
+
     !   ======== SCALE THE CALCULATED VALUE ========
     DO I = 1, L
         DO J = 1, M
@@ -520,7 +528,6 @@ CONTAINS
         END DO
     END DO
 
-!if(myid==0) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
 !if(myid==1) WRITE(*,*)'fft-step6 ', myid, SCALX, SCALY, FR
     !   ======== RE -STORE AND ASSIGN DATA TO DPH ========
     VAR = 0.0_WP
@@ -532,7 +539,7 @@ CONTAINS
            END DO
         END DO
     END DO
-        !if(myid==0) WRITE(*,*)'fft-out', myid, var
+if(myid==0) WRITE(*,*)'fft-out',var
         !if(myid==1) WRITE(*,*)'fft-out', myid, var
 
     RETURN

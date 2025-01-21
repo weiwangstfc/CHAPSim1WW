@@ -103,7 +103,9 @@
                        DPH_io(IC,JC,KC)= DPH_io(IC,JC,KC) + DTAU21DX + DTAU22DY + DTAU23DZ
                        !if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
                        ! write(*,*) 'visy-123', DTAU21DX, DTAU22DY, DTAU23DZ, DTAU22DD
-!
+#ifdef DEBUG
+  if(myid==0 .and. ic==1 .and. kc==1 .and. jc<=4) write(*,*) 'visy-21,22,23', JC, DTAU21DX, DTAU22DY, DTAU23DZ
+#endif
                     END DO
                 END DO
             END DO

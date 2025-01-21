@@ -62,8 +62,8 @@
                 
             ENDDO
             ! set b.c. for phi=====
-            AMPH0 = AMPH(1)
-            APPH0 = APPH(NCL2)
+            !AMPH0 = AMPH(1)
+            !APPH0 = APPH(NCL2)
             ACPH(1:NCL2)= -( AMPH(1:NCL2)+APPH(1:NCL2) )
             !================
             !pressure gradient equal to zero at wall
@@ -241,8 +241,8 @@
                 
             ENDDO
             ! set b.c. for phi=====
-            AMPH0 = AMPH(1)
-            APPH0 = APPH(NCL2)
+            ! = AMPH(1)
+            !APPH0 = APPH(NCL2)
             ACPH(1:NCL2)= -( AMPH(1:NCL2)+APPH(1:NCL2) )
             
           
@@ -361,8 +361,8 @@
         CALL MPI_BCAST( ACVR, NND2*3, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
         CALL MPI_BCAST( APVR, NND2*3, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
         
-        CALL MPI_BCAST( AMPH0, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
-        CALL MPI_BCAST( APPH0, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
+        !CALL MPI_BCAST( AMPH0, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
+        !CALL MPI_BCAST( APPH0, 1, MPI_DOUBLE_PRECISION, 0, ICOMM, IERROR )
         !END IF
         
  

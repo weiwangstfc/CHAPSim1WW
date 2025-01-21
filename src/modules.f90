@@ -172,8 +172,8 @@
         REAL(WP),ALLOCATABLE  :: ACPH(:)
         REAL(WP),ALLOCATABLE  :: APPH(:)
         
-        REAL(WP)  :: AMPH0
-        REAL(WP)  :: APPH0
+        !REAL(WP)  :: AMPH0
+        !REAL(WP)  :: APPH0
         !REAL(WP),ALLOCATABLE  :: DPDYWAL(:,:,:)
         
         REAL(WP)               :: AMVR1, APVRN

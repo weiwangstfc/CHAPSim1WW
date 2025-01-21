@@ -33,41 +33,12 @@ FOPT = -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch #-intel
 #OPT = -r8 -fallow-invalid-boz -fallow-argument-mismatch ###!check gfortran
 ifeq ($(cfg), gnu)
 #-O0 -DDEBUG -fbacktrace -fbounds-check -fcheck=all -fdump-core -ffpe-trap=invalid,zero,overflow -finit-real=nan -fsignaling-nans -Warray-temporaries -Wall -Waliasing -Wampersand -Warray-bounds -Warray-temporaries -Wcharacter-truncation -Wconversion -Wconversion-extra -Wextra -Wline-truncation -Wintrinsics-std -Wintrinsic-shadow -Wno-align-commons -Wreal-q-constant -Wunused-parameter -Wsurprising -Wunderflow -pedantic -pedantic-errors
-    FOPT12 = \
-                	 -Og\
-                	 -DDEBUG\
-                	 -fbacktrace\
-                	 -fbounds-check\
-                	 -fcheck=all\
-                	 -fdump-core\
-                	 -ffpe-trap=invalid,zero,overflow\
-                	 -finit-real=nan\
-                	 -fsignaling-nans\
-                	 -Warray-temporaries\
-                	 -Wall\
-                	 -Waliasing\
-                	 -Wampersand\
-                	 -Warray-bounds\
-                	 -Warray-temporaries\
-                	 -Wcharacter-truncation\
-                	 -Wconversion\
-                	 -Wconversion-extra\
-                	 -Wextra\
-                	 -Wline-truncation\
-                	 -Wintrinsics-std\
-                	 -Wintrinsic-shadow\
-                	 -Wno-align-commons\
-                	 -Wreal-q-constant\
-                	 -Wunused-parameter\
-                	 -Wsurprising\
-                	 -Wunderflow\
-                	 -pedantic\
-                	 -pedantic-errors\
-                	 -fallow-argument-mismatch
+    FOPT12 = -O -g -Wall -fbacktrace -fbounds-check -fcheck=all -ffpe-trap=invalid,zero,overflow \
+           -ffree-line-length-512 -Wuninitialized -Wmaybe-uninitialized -Wno-unused -cpp
+    FOPT12 += -fallow-argument-mismatch -fcheck=no-array-temps -DDEBUG
              #-mcmodel medium #
     FOPT3 = -Og -g -fno-range-check -fbacktrace -fbounds-check
-    FOPT4 = -Og -g -fno-range-check -fbacktrace -fbounds-check 
-    
+    FOPT4 = -Og -g -fno-range-check -fbacktrace -fbounds-check     
 else ifeq ($(cfg), intel)
     FOPT12 = -Og -g\
                 	 -traceback\

@@ -400,10 +400,10 @@
         character(128) :: FLNM
         logical :: file_exists
         integer :: n, i, j, k, jj
-RETURN ! test
+
         a = (/1, 1, 1, 1, 8, 8, 8, 8, &
-        1, 2, 3, 4, 1, 2, 3, 4, &
-        1, 1, 1, 1, 8, 8, 8, 8/)
+              1, 2, 3, 4, 1, 2, 3, 4, &
+              1, 1, 1, 1, 8, 8, 8, 8/)
         nid = reshape(a, (/8, 3/))
 
 
@@ -412,7 +412,7 @@ RETURN ! test
         do n = 1, NPT
             
             WRITE(PNTIM,'(I1.1)') n
-            FLNM = 'code1ww_p'//PNTIM//trim(str)//'.dat'
+            FLNM = 'chapsim1_p'//PNTIM//trim(str)//'.dat'
             
 
             DO J = 1, N2DO(MYID)

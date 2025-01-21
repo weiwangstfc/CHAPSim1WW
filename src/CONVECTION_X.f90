@@ -152,6 +152,10 @@
                     
                     !IF(myid==0 .and. JC==n2do(0)) write(*,'(A,3I4.1,5ES13.5)') 'convx',&
                     !JC,KC,IC,H12F,G_IO(IC,JP,KC,2),G_IO(IM,JP,KC,2),Q_IO(IC,JP,KC,1),Q_IO(IC,JC,KC,1)
+
+#ifdef DEBUG
+  if(myid==0 .and. ic==1 .and. kc==1 .and. jc<=4) write(*,*) 'conx-11,12,13',JC, -H11, -H12, -H13
+#endif
                     
                 END DO
             

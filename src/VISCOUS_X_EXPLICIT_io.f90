@@ -106,6 +106,9 @@
 
                     !if(myid==0 .and. IC == 1 .and. KC == 1 .and. JJ <=4) &
                     !write(*,*) 'visx-123', DTAU11DX, DTAU12DY, DTAU13DZ
+#ifdef DEBUG
+  if(myid==0 .and. ic==1 .and. kc==1 .and. jc<=4) write(*,*) 'visx-11,12,13', JC, DTAU11DX, DTAU12DY, DTAU13DZ
+#endif
         
                 END DO
             END DO

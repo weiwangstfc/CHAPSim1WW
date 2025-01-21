@@ -61,11 +61,14 @@
                 ENDDO
             ENDDO
         ENDDO  
-! if(myid == 0) then        
-!     write(*,*) 'ux, random+Vini', Q_io(:, 8, 8, 1)
-!     write(*,*) 'uy, random+Vini', Q_io(:, 8, 8, 2)
-!     write(*,*) 'uz, random+Vini', Q_io(:, 8, 8, 3)
-! end if
+#ifdef DEBUG 
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'qx@af init', 0 ,0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'qy@af init', 0 ,0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'qz@af init', 0 ,0) ! debug4chapsim2
+        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    '', 'pr@af init', 0 ,0) ! debug4chapsim2 
+          
+        
+#endif
 
         !IF(ICASE.NE.ICHANL) CALL VELO2RVELO_IO
         
@@ -317,11 +320,7 @@
                     
                 END DO
             END DO
-        ! TEST===========    
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), 'ux', '@af init', 0 ,0) ! debug4chapsim2
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), 'uy', '@af init', 0 ,0) ! debug4chapsim2
-        ! call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), 'uz', '@af init', 0 ,0) ! debug4chapsim2
-        ! call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    'pr', '@af init', 0 ,0) ! debug4chapsim2   
+
         END IF
         !*****************************************************************************
         
@@ -338,12 +337,12 @@
                  
             
         CALL VELO2MASSFLUX
-        
-        ! if(myid == 0) then        
-        !     write(*,*) 'ux, random', Q_io(:, 8, 8, 1), Q_io(:, 1, 8, 1)
-        !     write(*,*) 'uy, random', Q_io(:, 8, 8, 2), Q_io(:, 1, 8, 2)
-        !     write(*,*) 'uz, random', Q_io(:, 8, 8, 3), Q_io(:, 1, 8, 3)
-        ! end if
+#ifdef DEBUG
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 1), '', 'qx@af radm', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 2), '', 'qy@af radm', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(Q_IO (1:NCL1_io, 1:N2DO(myid), 1:NCL3, 3), '', 'qz@af radm', 0, 0) ! debug4chapsim2
+        call wrt_3d_pt_debug(PR_io(1:NCL1_io, 1:N2DO(myid), 1:NCL3),    '', 'pr@af radm', 0, 0) ! debug4chapsim2
+#endif
  
         RETURN
     END SUBROUTINE

@@ -32,7 +32,9 @@
                 ENDDO    
                 
                 DO J=1,NCL2
-                    YCC(J)=(YND(J)+YND(J+1))*0.50_WP
+                    X2=(DBLE(J-1)+0.5_WP)/DBLE(NND2-1)
+                    YCC(J)=DTANH(STR2*(X2-COE1))/DTANH(STR2*COE1)
+                  !YCC(J)=(YND(J)+YND(J+1))*0.50_WP
                 ENDDO
             else if (ISTR2 == 0) then ! no streching
                 DO  J=1,NND2
@@ -41,7 +43,22 @@
                 DO J=1,NCL2
                     YCC(J) = 0.5_WP*(YND(J)+YND(J+1))
                 END DO
-            else
+            else if(ISTR2 == 2) then ! read data from a file
+                NFIL=NFIL+1
+                OPEN(NFIL,FILE='YND.dat')
+                REWIND NFIL
+                DO J=1,NND2
+                    READ(NFIL,*) YND(J)
+                ENDDO
+                CLOSE(NFIL)
+                
+                NFIL=NFIL+1
+                OPEN(NFIL,FILE='YCC.dat')
+                REWIND NFIL
+                DO J=1,NCL2
+                    READ(NFIL,*) YCC(J)
+                ENDDO
+                CLOSE(NFIL)
             end if
                 
            CASE (IPIPEC)
@@ -58,7 +75,9 @@
                     end if
                 ENDDO 
                 DO J=1,NCL2
-                    YCC(J)=(YND(j)+YND(j+1))*0.50_WP
+                    X2=(DBLE(J-1)+0.5_WP)/DBLE(NND2-1)  
+                    YCC(j)=DTANH(STR2*(X2))/DTANH(STR2) 
+                    !YCC(J)=(YND(j)+YND(j+1))*0.50_WP
                     RCCI1(J)=1.0_WP/ YCC(J)
                     RCCI2(J)=RCCI1(J)*RCCI1(J)
                 END DO
